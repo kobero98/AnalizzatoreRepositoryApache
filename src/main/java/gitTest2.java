@@ -64,54 +64,47 @@ public class gitTest2 {
             git = Git.open(f);
                 git.pull().call();
         }
-        try {
-            List<Ref> t = git.tagList().call();
-        } catch (GitAPIException e) {
-            throw new RuntimeException(e);
-        }
         Iterable<RevCommit> log = null;
         log = git.log().call();
         InfoJira t = new InfoJira();
         CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
         writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
-        List<InfoVersion> stringList = t.listVersion();
+        List<InfoVersion> versionList = t.listVersion();
         List<Bug> listBug=t.listBug();
-        stringList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
-        int i = 0;
-        List<RevCommit> ListCommit = new ArrayList<RevCommit>();
+        versionList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
+        List<RevCommit> listCommit = new ArrayList<RevCommit>();
         for (RevCommit s : log) {
-            ListCommit.add(s);
+            listCommit.add(s);
         }
         List<ARFFList> listaF=new ArrayList<ARFFList>();
-        ARFFList c=new ARFFList(stringList.get(0).getS());
+        ARFFList c=new ARFFList(versionList.get(0).getS());
         listaF.add(c);
         int j;
         int k = 0;
-        for (j = ListCommit.size(); j >= 1; j--) {
+        for (j = listCommit.size(); j >= 1; j--) {
             RevCommit actual = null;
-            boolean flag=false;
-            if (j != ListCommit.size())
-                actual = ListCommit.get(j);
-            RevCommit success = ListCommit.get(j - 1);
+            if (j != listCommit.size())
+                actual = listCommit.get(j);
+            RevCommit success = listCommit.get(j - 1);
             String idJira=getIDJira(success.getShortMessage());
             Bug bugCatch=bugContains(listBug,idJira);
             String nameAuthor = success.getAuthorIdent().getName();
             Date dataSuccess = success.getCommitterIdent().getWhen();
             try (ObjectReader reader = git.getRepository().newObjectReader()) {
                 AbstractTreeIterator oldTreeIterator = new EmptyTreeIterator();
-                if (j != ListCommit.size())
+                if (j != listCommit.size())
                     oldTreeIterator = new CanonicalTreeParser(null, reader, actual.getTree().getId());
                 AbstractTreeIterator newTreeIterator = new CanonicalTreeParser(null, reader, success.getTree().getId());
                 try (DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
                     formatter.setRepository(git.getRepository());
-                    List<DiffEntry> ListDiff = formatter.scan(oldTreeIterator, newTreeIterator);
-                    for (DiffEntry diff : ListDiff) {
+                    List<DiffEntry> listDiff = formatter.scan(oldTreeIterator, newTreeIterator);
+                    for (DiffEntry diff : listDiff) {
                         if (diff.getNewPath().endsWith(".java") || diff.getOldPath().endsWith(".java")) {
-                            EditList ListEdit=formatter.toFileHeader(diff).toEditList();
+                            EditList listEdit=formatter.toFileHeader(diff).toEditList();
                             if (diff.getChangeType() == DiffEntry.ChangeType.ADD) {
                                 Row app = new Row(diff.getNewPath());
                                 app.increaseNCommit();
-                                app.modifySizeByEdit(ListEdit);
+                                app.modifySizeByEdit(listEdit);
                                 app.readyWorkerOn(nameAuthor);
                                 c.add(app);
                                 }
@@ -120,26 +113,26 @@ public class gitTest2 {
                                     int index = c.contains(diff.getOldPath());
                                     c.getRows().get(index).setPath(diff.getNewPath());
                                     c.increaseNCommit(index);
-                                    c.getRows().get(index).modifySizeByEdit(ListEdit);
+                                    c.getRows().get(index).modifySizeByEdit(listEdit);
                                     c.increaseWorkOnCommit(index, nameAuthor);
-                                    setBuggy(bugCatch,listaF,stringList,diff.getOldPath());
+                                    setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
                                 } else {
                                     if (diff.getChangeType() == DiffEntry.ChangeType.DELETE) c.remove(diff.getOldPath());
-                                    setBuggy(bugCatch,listaF,stringList,diff.getOldPath());
+                                    setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
                                 }
                             }
                         }
                     }
                 }
                 }
-            if (dataSuccess.after(stringList.get(k).getData())) {
+            if (dataSuccess.after(versionList.get(k).getData())) {
                     k++;
                     ArrayList<Row> finta=new ArrayList<>();
                     for (Row app:c.getRows()){
                         Row s=new Row(app);
                         finta.add(s);
                     }
-                    c=new ARFFList(stringList.get(k).getS());
+                    c=new ARFFList(versionList.get(k).getS());
                     c.getRows().addAll(finta);
                     listaF.add(c);
                  }
