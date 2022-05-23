@@ -11,8 +11,8 @@ import java.util.*;
 
 public class InfoJira {
     private  String projName ="AVRO";
-    //private String projName="BOOKKEEPER";
     private List<InfoVersion> listVersion;
+
 
     private InfoVersion searchOpening(Date d){
         for (InfoVersion s:listVersion)
@@ -20,16 +20,6 @@ public class InfoJira {
             if(d.after(s.getData())) return s;
         }
         return null;
-    }
-    private boolean contain(List<InfoVersion> s, InfoVersion l)
-    {
-        for(InfoVersion app:s){
-            if(app.getS().compareTo(l.getS())==0)
-            {
-                return true;
-            }
-        }
-        return false;
     }
     private void sort(List <InfoVersion> s){
             int i;
@@ -121,12 +111,6 @@ public class InfoJira {
         }while(i<total);
         return bug;
     }
- /*   public static void main(String [] args) throws IOException, ParseException {
-        InfoJira t=new InfoJira();
-        t.ListVersion();
-        ArrayList<Bug> s=t.ListBug();
-    }
-  */
     private static String readAll(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cp;

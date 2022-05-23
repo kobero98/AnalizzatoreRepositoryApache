@@ -27,9 +27,6 @@ public class gitTest2 {
     private static String projectName="Bookkeeper";
     private static String linkRepo="https://github.com/kobero98/avro.git";
 
-    /*
-    private static String projectName="./bookkeeper";*/
-    //private static String linkRepo="https://github.com/apache/bookkeeper.git";
 
     private static String getIDJira(String shortestMessage){
         String s=null;
