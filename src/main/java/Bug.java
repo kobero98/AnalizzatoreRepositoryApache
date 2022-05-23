@@ -1,10 +1,35 @@
-import java.util.ArrayList;
+import java.util.List;
 
 public class Bug {
-    public String name;
-    public InfoVersion fixed;
-    public InfoVersion affected;
-    public Bug(String name, ArrayList<InfoVersion>fixedList, ArrayList<InfoVersion>AffectedList){
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    private String name;
+
+    public InfoVersion getFixed() {
+        return fixed;
+    }
+
+    public void setFixed(InfoVersion fixed) {
+        this.fixed = fixed;
+    }
+
+    public InfoVersion getAffected() {
+        return affected;
+    }
+
+    public void setAffected(InfoVersion affected) {
+        this.affected = affected;
+    }
+
+    private InfoVersion fixed;
+    private InfoVersion affected;
+    public Bug(String name, List<InfoVersion> fixedList, List<InfoVersion>affectedList){
         this.name=name;
         this.fixed=null;
         this.affected=null;
@@ -15,9 +40,9 @@ public class Bug {
             if(max.getData().before(app.getData())) max=app;
         }
         fixed=new InfoVersion(max.getData(),max.getS());
-        if(AffectedList.isEmpty()) return;
-        max=AffectedList.get(0);
-        for (InfoVersion app:AffectedList)
+        if(affectedList.isEmpty()) return;
+        max=affectedList.get(0);
+        for (InfoVersion app:affectedList)
         {
             if(max.getData().after(app.getData())) max=app;
         }

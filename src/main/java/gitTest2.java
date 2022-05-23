@@ -42,14 +42,14 @@ public class gitTest2 {
     }
     private static Bug bugContains(List<Bug> list, String id){
         for (Bug b:list){
-            if(b.name.equals(id)) return b;
+            if(b.getName().equals(id)) return b;
         }
         return null;
     }
     private static void setBuggy(Bug b, List<ARFFList> list, List<InfoVersion> versions, String path){
         if(b==null) return;
-        int inizio= versions.indexOf(b.affected);
-        int fine=versions.indexOf(b.fixed)-1;
+        int inizio= versions.indexOf(b.getAffected());
+        int fine=versions.indexOf(b.getFixed())-1;
         for (int k=inizio;k<fine && k<list.size()-1;k++){
             for (Row r:list.get(k).getRows())
             {

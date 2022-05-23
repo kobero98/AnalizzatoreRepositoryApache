@@ -88,7 +88,7 @@ public class InfoJira {
                 if(!fixedList.isEmpty()){
                     int ov=-1;
                     Bug b=new Bug(name,fixedList,affectedList);
-                    int fv= this.listVersion.indexOf(b.fixed);
+                    int fv= this.listVersion.indexOf(b.getFixed());
                     String opening;
                     InfoVersion v=null;
                     if(!issues.getJSONObject(i%50).getJSONObject("fields").isNull("created")) {
@@ -98,19 +98,19 @@ public class InfoJira {
                         ov = this.listVersion.indexOf(v);
                     }
                     if(ov>-1 && ov<fv) {
-                        if (b.affected == null || b.distance() < 0) {
+                        if (b.getAffected() == null || b.distance() < 0) {
                             int p = Proportion.getPropotion().getValor();
                             int index = this.listVersion.indexOf(v);
                             affectedList.add(this.listVersion.get(fv - (fv - index) * p));
                             b = new Bug(name, fixedList, affectedList);
                         } else {
-                            int av = this.listVersion.indexOf(b.affected);
+                            int av = this.listVersion.indexOf(b.getFixed());
                             Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
                         }
                         if (b.distance() != 0) bug.add(b);
                     }
                     else{
-                        if(b.affected!=null && b.distance()>0)
+                        if(b.getAffected()!=null && b.distance()>0)
                         {
                             bug.add(b);
                         }
