@@ -46,12 +46,12 @@ public class gitTest2 {
         }
         return null;
     }
-    private static void setBuggy(Bug b,List<ARFFList> list,List<infoVersion> versions,String path){
+    private static void setBuggy(Bug b, List<ARFFList> list, List<InfoVersion> versions, String path){
         if(b==null) return;
         int inizio= versions.indexOf(b.affected);
         int fine=versions.indexOf(b.fixed)-1;
         for (int k=inizio;k<fine && k<list.size()-1;k++){
-            for (row r:list.get(k).getRows())
+            for (Row r:list.get(k).getRows())
             {
                 if(r.getPath().equals(path)) r.setBuggy(true);
             }
@@ -79,12 +79,12 @@ public class gitTest2 {
         } catch (GitAPIException e) {
             e.printStackTrace();
         }
-        infoJira t = new infoJira();
+        InfoJira t = new InfoJira();
         CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
         writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
-        List<infoVersion> stringList = t.ListVersion();
+        List<InfoVersion> stringList = t.ListVersion();
         ArrayList<Bug> listBug=t.ListBug();
-        stringList.add(new infoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
+        stringList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
         int i = 0;
         List<RevCommit> ListCommit = new ArrayList<RevCommit>();
         for (RevCommit s : log) {
@@ -117,7 +117,7 @@ public class gitTest2 {
                         if (diff.getNewPath().endsWith(".java") || diff.getOldPath().endsWith(".java")) {
                             EditList ListEdit=formatter.toFileHeader(diff).toEditList();
                             if (diff.getChangeType() == DiffEntry.ChangeType.ADD) {
-                                row app = new row(diff.getNewPath());
+                                Row app = new Row(diff.getNewPath());
                                 app.increaseNCommit();
                                 app.modifySizeByEdit(ListEdit);
                                 app.readyWorkerOn(nameAuthor);
@@ -142,9 +142,9 @@ public class gitTest2 {
                 }
             if (dataSuccess.after(stringList.get(k).getData())) {
                     k++;
-                    ArrayList<row> finta=new ArrayList<>();
-                    for (row app:c.getRows()){
-                        row s=new row(app);
+                    ArrayList<Row> finta=new ArrayList<>();
+                    for (Row app:c.getRows()){
+                        Row s=new Row(app);
                         finta.add(s);
                     }
                     c=new ARFFList(stringList.get(k).getS());

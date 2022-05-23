@@ -1,13 +1,13 @@
-public class propotion {
-    private static propotion me=null;
+public class Proportion {
+    private static Proportion me=null;
     private int n;
     private double durata;
-    private propotion(){
+    private Proportion(){
         this.n=0;
         this.durata=0.0;
     }
-    public static propotion getPropotion(){
-        if(me==null) me=new propotion();
+    public static Proportion getPropotion(){
+        if(me==null) me=new Proportion();
         return me;
     }
     public void increment(double d){

@@ -5,7 +5,7 @@ import java.util.ArrayList;
 
 
 //a
-public class row{
+public class Row {
     private String path;
     private Integer size;
     private int N_commit;
@@ -19,7 +19,7 @@ public class row{
     private int Max_Churn;
     private ArrayList<String>worker;
     private boolean buggy;
-    row(String name) {
+    Row(String name) {
         this.path=name;
         this.size=0;
         this.N_commit=0;
@@ -35,7 +35,7 @@ public class row{
         this.buggy=false;
 
     }
-    row(row riga){
+    Row(Row riga){
         this.path=riga.getPath();
         this.size=riga.getSize();
         this.N_commit= riga.getN_commit();

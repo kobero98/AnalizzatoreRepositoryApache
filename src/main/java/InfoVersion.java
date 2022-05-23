@@ -1,10 +1,10 @@
 import java.util.Date;
 
-public class infoVersion {
+public class InfoVersion {
     private Date data;
     private String s;
-    public infoVersion(){}
-    public infoVersion(Date data,String nome){
+    public InfoVersion(){}
+    public InfoVersion(Date data, String nome){
         this.data=data;
         this.s=nome;
     }
@@ -32,7 +32,7 @@ public class infoVersion {
     public boolean equals(Object obj) {
 
         if(obj.getClass()==this.getClass()) 
-            return ((infoVersion) obj).getS().equals(this.getS());
+            return ((InfoVersion) obj).getS().equals(this.getS());
         return false;
     }
 }
