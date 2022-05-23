@@ -12,7 +12,16 @@ import java.util.*;
 
 public class infoJira {
     private  String projName ="AVRO";
+    //private String projName="BOOKKEEPER";
+    private List<infoVersion> listVersion;
 
+    private infoVersion searchOpening(Date d){
+        for (infoVersion s:listVersion)
+        {
+            if(d.after(s.getData())) return s;
+        }
+        return null;
+    }
     private boolean contain(List<infoVersion> s,infoVersion l)
     {
         for(infoVersion app:s){
@@ -38,8 +47,86 @@ public class infoJira {
                 }
             }
     }
-
-
+    public  ArrayList<Bug> ListBug() throws IOException, ParseException {
+        Integer i=0;
+        Integer j=0;
+        ArrayList<Bug> bug;
+        bug = new ArrayList<Bug>();
+        int total=1;
+        do{
+            String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22"
+                    + projName + "%22AND%20affectedVersion%20%20is%20not%20EMPTY%20AND%20fixVersion%20is%20not%20EMPTY%20%20AND%20type%20%3D%20Bug%20AND%20(status%20%3D%20Closed%20OR%20status%20%3DResolved)%20" +
+                    "&fields=key,fixVersions,versions,created,resolution&&startAt="
+                    + j.toString();
+            j=i+50;
+            JSONObject json = readJsonFromUrl(url);
+            JSONArray issues = json.getJSONArray("issues");
+            total = json.getInt("total");
+            for (; i < total && i<j; i++) {
+                String name = issues.getJSONObject(i%50).getString("key");
+                int dim=issues.getJSONObject(i%50).getJSONObject("fields").getJSONArray("fixVersions").length();
+                String nome;
+                Date data;
+                ArrayList<infoVersion> fixedList=new ArrayList<infoVersion>();
+                for (int k=0;k<dim;k++) {
+                    if(issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("fixVersions").getJSONObject(k).getBoolean("released") &&
+                            !issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("fixVersions").getJSONObject(k).isNull("releaseDate")) {
+                        nome = issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("fixVersions").getJSONObject(k).getString("name");
+                        data = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("fixVersions").getJSONObject(k).getString("releaseDate"));
+                        fixedList.add(new infoVersion(data,nome));
+                    }
+                }
+                ArrayList<infoVersion> affectedList=new ArrayList<infoVersion>();
+                dim=issues.getJSONObject(i%50).getJSONObject("fields").getJSONArray("versions").length();
+                for (int k=0;k<dim;k++) {
+                    if(issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("versions").getJSONObject(k).getBoolean("released") &&
+                            !issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("versions").getJSONObject(k).isNull("releaseDate")) {
+                        nome= issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("versions").getJSONObject(k).getString("name");
+                        data = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i % 50).getJSONObject("fields").getJSONArray("versions").getJSONObject(k).getString("releaseDate"));
+                        affectedList.add(new infoVersion(data,nome));
+                    }
+                }
+                if(!fixedList.isEmpty()){
+                    int ov=-1;
+                    Bug b=new Bug(name,fixedList,affectedList);
+                    int fv= this.listVersion.indexOf(b.fixed);
+                    String opening;
+                    infoVersion v=null;
+                    if(!issues.getJSONObject(i%50).getJSONObject("fields").isNull("created")) {
+                        opening = issues.getJSONObject(i % 50).getJSONObject("fields").get("created").toString();
+                        Date openingVersion = new SimpleDateFormat("yyyy-MM-dd").parse(opening);
+                        v = searchOpening(openingVersion);
+                        ov = this.listVersion.indexOf(v);
+                    }
+                    if(ov>-1 && ov<fv) {
+                        if (b.affected == null || b.distance() < 0) {
+                            int p = propotion.getPropotion().getValor();
+                            int index = this.listVersion.indexOf(v);
+                            affectedList.add(this.listVersion.get(fv - (fv - index) * p));
+                            b = new Bug(name, fixedList, affectedList);
+                        } else {
+                            int av = this.listVersion.indexOf(b.affected);
+                            propotion.getPropotion().increment((fv - av) / (fv - ov));
+                        }
+                        if (b.distance() != 0) bug.add(b);
+                    }
+                    else{
+                        if(b.affected!=null && b.distance()>0)
+                        {
+                            bug.add(b);
+                        }
+                    }
+                }
+            }
+        }while(i<total);
+        return bug;
+    }
+ /*   public static void main(String [] args) throws IOException, ParseException {
+        infoJira t=new infoJira();
+        t.ListVersion();
+        ArrayList<Bug> s=t.ListBug();
+    }
+  */
     private static String readAll(Reader rd) throws IOException {
         StringBuilder sb = new StringBuilder();
         int cp;
@@ -73,48 +160,21 @@ public class infoJira {
     }
     public List<infoVersion> ListVersion() throws IOException, JSONException, ParseException {
         Integer j = 0, i = 0, total = 1;
-        List<infoVersion> s=new ArrayList<infoVersion>();
-        //Get JSON API for closed bugs w/ AV in the project
-        //Only gets a max of 1000 at a time, so must do this multiple times if bugs >1000
-
-            /*String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22"
-                    + projName + "%22&fields=key,resolutiondate,versions,created&startAt="
-                    + i.toString() + "&maxResults=" + j.toString();
-
-             */
-            String url= "https://issues.apache.org/jira/rest/api/2/project/"+this.projName+"/version?";
-            JSONObject json = readJsonFromUrl(url);
-            JSONArray issues = json.getJSONArray("values");
-            total = json.getInt("total");
-            for (; i < total ; i++){
-                String name=issues.getJSONObject(i).get("name").toString();
-                Date day=null;
-                if(!issues.getJSONObject(i).isNull("releaseDate")) {
-                    day = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i).get("releaseDate").toString());
-                    infoVersion f = new infoVersion(day, name);
-                    s.add(f);
-                }
+        listVersion=new ArrayList<infoVersion>();
+        String url= "https://issues.apache.org/jira/rest/api/2/project/"+this.projName+"/version?";
+        JSONObject json = readJsonFromUrl(url);
+        JSONArray issues = json.getJSONArray("values");
+        total = json.getInt("total");
+        for (; i < total ; i++){
+            String name=issues.getJSONObject(i).get("name").toString();
+            Date day=null;
+            if(!issues.getJSONObject(i).isNull("releaseDate")) {
+                day = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i).get("releaseDate").toString());
+                infoVersion f = new infoVersion(day, name);
+                listVersion.add(f);
             }
-           /* for (; i < total && i < j; i++) {
-                //Iterate through each bug
-                boolean x= issues.getJSONObject(i).getJSONObject("fields").getJSONArray("versions").isEmpty();
-                if(!x) {
-                    for (int k=0;k<issues.getJSONObject(i%1000).getJSONObject("fields").getJSONArray("versions").length();k++) {
-                        String key = issues.getJSONObject(i % 1000).getJSONObject("fields").getJSONArray("versions").getJSONObject(k).get("name").toString();
-                        Date day = null;
-                        if (!issues.getJSONObject(i % 1000).getJSONObject("fields").getJSONArray("versions").getJSONObject(k).isNull("releaseDate")) {
-                            day = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i % 1000).getJSONObject("fields").getJSONArray("versions").getJSONObject(k).get("releaseDate").toString());
-                        }
-                        infoVersion f = new infoVersion(day, key);
-                        if (!contain(s,f) &&(day != null)) {
-                            s.add(f);
-                        }
-                    }
-                }
-            }
-            */
-
-        sort(s);
-        return s;
+        }
+        sort(listVersion);
+        return listVersion;
     }
 }

@@ -42,6 +42,7 @@ public class ARFFList {
                     rows.get(i).getPath(),
                     Integer.toString(rows.get(i).getSize()),
                     Integer.toString(rows.get(i).getN_commit()),
+                    Integer.toString(rows.get(i).getN_commitRelease()),
                     Integer.toString(rows.get(i).getWorker().size()),
                     Integer.toString(rows.get(i).getN_LocTouched()),
                     Integer.toString(rows.get(i).getLoc_Added()),
@@ -55,5 +56,10 @@ public class ARFFList {
             list.add(x);
         }
         return list;
+    }
+    public void setZero(){
+        for (row s:this.rows){
+            s.setZero();
+        }
     }
 }

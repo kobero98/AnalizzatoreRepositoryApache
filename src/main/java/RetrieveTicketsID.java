@@ -67,7 +67,6 @@ public class RetrieveTicketsID {
                     }
                 }
         } while (i < total);
-         System.out.println(total);
         return;
     }
 
