@@ -5,7 +5,6 @@ import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.EditList;
 import org.eclipse.jgit.lib.ObjectReader;
-import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
@@ -23,7 +22,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 
-public class gitTest2 {
+public class Deliverable1 {
     private static String projectName="Bookkeeper";
     private static String linkRepo="https://github.com/kobero98/avro.git";
 
