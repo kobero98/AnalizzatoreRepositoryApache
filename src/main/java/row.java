@@ -2,8 +2,7 @@ import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.diff.EditList;
 
 import java.util.ArrayList;
-import java.util.Random;
-import java.util.random.RandomGenerator;
+
 
 //a
 public class row{

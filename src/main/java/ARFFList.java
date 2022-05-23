@@ -1,14 +1,19 @@
 import java.util.ArrayList;
+import java.util.List;
 
 public class ARFFList {
     private String release;
-    public ArrayList<row> rows;
+    private List<row> rows;
     ARFFList(String releaseName){
         this.release=releaseName;
-        this.rows=new ArrayList<row>();
+        this.rows=new ArrayList<>();
     }
     public void add(row r){
         rows.add(r);
+    }
+
+    public List<row> getRows(){
+        return this.rows;
     }
     public int contains(String r){
         for(int i=0;i< rows.size();i++)
@@ -32,7 +37,7 @@ public class ARFFList {
     public void increaseWorkOnCommit(int i,String name){
         rows.get(i).readyWorkerOn(name);
     }
-    public ArrayList<String []> toArrayString(){
+    public List<String []> toArrayString(){
 
         ArrayList<String[]> list=new ArrayList<String[]>();
         for (int i=0;i< rows.size();i++)

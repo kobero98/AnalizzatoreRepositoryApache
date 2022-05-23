@@ -1,28 +1,19 @@
 import com.opencsv.CSVWriter;
-import org.eclipse.jgit.api.CloneCommand;
-import org.eclipse.jgit.api.DiffCommand;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
 import org.eclipse.jgit.diff.DiffFormatter;
 import org.eclipse.jgit.diff.EditList;
-import org.eclipse.jgit.lib.AnyObjectId;
 import org.eclipse.jgit.lib.ObjectReader;
 import org.eclipse.jgit.lib.Ref;
 import org.eclipse.jgit.revwalk.RevCommit;
-import org.eclipse.jgit.revwalk.RevTag;
-import org.eclipse.jgit.revwalk.RevWalk;
-import org.eclipse.jgit.revwalk.filter.RevFilter;
 import org.eclipse.jgit.treewalk.AbstractTreeIterator;
 import org.eclipse.jgit.treewalk.CanonicalTreeParser;
 import org.eclipse.jgit.treewalk.EmptyTreeIterator;
 import org.eclipse.jgit.util.io.DisabledOutputStream;
-
-import javax.print.DocFlavor;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.nio.file.Path;
 import java.text.ParseException;
 import java.time.Instant;
 import java.util.ArrayList;
@@ -64,44 +55,23 @@ public class gitTest2 {
         System.out.println(fine +"---"+b.fixed);
         for (int k=inizio;k<fine && k<list.size()-1;k++){
             System.out.println(k);
-            for (row r:list.get(k).rows)
+            for (row r:list.get(k).getRows())
             {
                 if(r.getPath().equals(path)) {r.setBuggy(true);
                 System.out.println("true");}
             }
         }
     }
-    public static void main(String[] arg) throws IOException, ParseException {
+    public static void main(String[] arg) throws IOException, ParseException, GitAPIException {
         File f = new File("./Test"+projectName);
         Git git = null;
         try {
             git = Git.cloneRepository().setURI(linkRepo)
                     .setDirectory(f).setCloneAllBranches(true).call();
         } catch (GitAPIException | JGitInternalException e) {
-            try {
-                git = Git.open(f);
+            git = Git.open(f);
                 git.pull().call();
-            } catch (IOException es) {
-                e.printStackTrace();
-            } catch (CanceledException es) {
-                e.printStackTrace();
-            } catch (NoHeadException es) {
-                e.printStackTrace();
-            } catch (RefNotAdvertisedException es) {
-                e.printStackTrace();
-            } catch (RefNotFoundException es) {
-                e.printStackTrace();
-            } catch (WrongRepositoryStateException es) {
-                e.printStackTrace();
-            } catch (InvalidRemoteException es) {
-                e.printStackTrace();
-            } catch (TransportException es) {
-                e.printStackTrace();
-            } catch (InvalidConfigurationException es) {
-                e.printStackTrace();
-            } catch (GitAPIException es) {
-                e.printStackTrace();
-            }
+
         }
         try {
             List<Ref> t = git.tagList().call();
@@ -165,9 +135,9 @@ public class gitTest2 {
                             else {
                                 if (diff.getChangeType() == DiffEntry.ChangeType.MODIFY || diff.getChangeType() == DiffEntry.ChangeType.COPY || diff.getChangeType() == DiffEntry.ChangeType.RENAME) {
                                     int index = c.contains(diff.getOldPath());
-                                    c.rows.get(index).setPath(diff.getNewPath());
+                                    c.getRows().get(index).setPath(diff.getNewPath());
                                     c.increaseNCommit(index);
-                                    c.rows.get(index).modifySizeByEdit(ListEdit);
+                                    c.getRows().get(index).modifySizeByEdit(ListEdit);
                                     c.increaseWorkOnCommit(index, nameAuthor);
                                     setBuggy(bugCatch,listaF,stringList,diff.getOldPath());
                                 } else {
@@ -182,12 +152,12 @@ public class gitTest2 {
             if (dataSuccess.after(stringList.get(k).getData())) {
                     k++;
                     ArrayList<row> finta=new ArrayList<>();
-                    for (row app:c.rows){
+                    for (row app:c.getRows()){
                         row s=new row(app);
                         finta.add(s);
                     }
                     c=new ARFFList(stringList.get(k).getS());
-                    c.rows.addAll(finta);
+                    c.getRows().addAll(finta);
                     //c.setZero();
                     listaF.add(c);
                  }
