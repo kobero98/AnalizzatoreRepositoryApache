@@ -27,8 +27,13 @@ public class ARFFList {
         this.release = release;
     }
     public void remove(String path){
-        for(int i = 0; i< rows.size(); i++)
-            if(rows.get(i).getPath().compareTo(path)==0) rows.remove(i);
+        for(int i = 0; i< rows.size(); i++) {
+            if (rows.get(i).getPath().compareTo(path) == 0) {
+                rows.remove(i);
+                i--;
+            }
+        }
+
     }
     public void increaseNCommit(int i){
         if(i<0 ||i>= rows.size()) return;
