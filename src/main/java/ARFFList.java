@@ -3,21 +3,21 @@ import java.util.List;
 
 public class ARFFList {
     private String release;
-    private List<Row> Rows;
+    private List<Row> rows;
     ARFFList(String releaseName){
         this.release=releaseName;
-        this.Rows =new ArrayList<>();
+        this.rows =new ArrayList<>();
     }
     public void add(Row r){
-        Rows.add(r);
+        rows.add(r);
     }
 
     public List<Row> getRows(){
-        return this.Rows;
+        return this.rows;
     }
     public int contains(String r){
-        for(int i = 0; i< Rows.size(); i++)
-            if(Rows.get(i).getPath().compareTo(r)==0) return i;
+        for(int i = 0; i< rows.size(); i++)
+            if(rows.get(i).getPath().compareTo(r)==0) return i;
         return -1;
     }
     public String getRelease() {
@@ -27,43 +27,43 @@ public class ARFFList {
         this.release = release;
     }
     public void remove(String path){
-        for(int i = 0; i< Rows.size(); i++)
-            if(Rows.get(i).getPath().compareTo(path)==0) Rows.remove(i);
+        for(int i = 0; i< rows.size(); i++)
+            if(rows.get(i).getPath().compareTo(path)==0) rows.remove(i);
     }
     public void increaseNCommit(int i){
-        if(i<0 ||i>= Rows.size()) return;
-        Rows.get(i).increaseNCommit();
+        if(i<0 ||i>= rows.size()) return;
+        rows.get(i).increaseNCommit();
     }
     public void increaseWorkOnCommit(int i,String name){
-        Rows.get(i).readyWorkerOn(name);
+        rows.get(i).readyWorkerOn(name);
     }
     public List<String []> toArrayString(){
 
         ArrayList<String[]> list=new ArrayList<String[]>();
-        for (int i = 0; i< Rows.size(); i++)
+        for (int i = 0; i< rows.size(); i++)
         {
             String[] x={
                     this.release,
-                    Rows.get(i).getPath(),
-                    Integer.toString(Rows.get(i).getSize()),
-                    Integer.toString(Rows.get(i).getN_commit()),
-                    Integer.toString(Rows.get(i).getN_commitRelease()),
-                    Integer.toString(Rows.get(i).getWorker().size()),
-                    Integer.toString(Rows.get(i).getN_LocTouched()),
-                    Integer.toString(Rows.get(i).getLoc_Added()),
-                    Integer.toString(Rows.get(i).getMax_LocAdded()),
-                    Integer.toString(Rows.get(i).getAvg_LocAdded()),
-                    Integer.toString(Rows.get(i).getChurn()),
-                    Integer.toString(Rows.get(i).getMax_Churn()),
-                    Integer.toString(Rows.get(i).getAVG_Churn()),
-                    Boolean.toString(Rows.get(i).isBuggy())
+                    rows.get(i).getPath(),
+                    Integer.toString(rows.get(i).getSize()),
+                    Integer.toString(rows.get(i).getNcommit()),
+                    Integer.toString(rows.get(i).getNcommitRelease()),
+                    Integer.toString(rows.get(i).getWorker().size()),
+                    Integer.toString(rows.get(i).getNLocTouched()),
+                    Integer.toString(rows.get(i).getLocAdded()),
+                    Integer.toString(rows.get(i).getMaxLocAdded()),
+                    Integer.toString(rows.get(i).getAvgLocAdded()),
+                    Integer.toString(rows.get(i).getChurn()),
+                    Integer.toString(rows.get(i).getMaxChurn()),
+                    Integer.toString(rows.get(i).getAVGChurn()),
+                    Boolean.toString(rows.get(i).isBuggy())
             };
             list.add(x);
         }
         return list;
     }
     public void setZero(){
-        for (Row s:this.Rows){
+        for (Row s:this.rows){
             s.setZero();
         }
     }

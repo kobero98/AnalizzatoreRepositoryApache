@@ -2,35 +2,34 @@ import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.diff.EditList;
 
 import java.util.ArrayList;
+import java.util.List;
 
 
 //a
 public class Row {
     private String path;
     private Integer size;
-    private int N_commit;
-    private int N_commitRelease;
-    private int N_Fix;
-    private int Loc_Added;
-    private int Loc_Delete;
-    private int Loc_replace;
-    private int Max_LocAdded;
-    private int Churn;
-    private int Max_Churn;
+    private int n_commit;
+    private int n_commitRelease;
+    private int loc_Added;
+    private int loc_Delete;
+    private int loc_replace;
+    private int max_LocAdded;
+    private int churn;
+    private int max_Churn;
     private ArrayList<String>worker;
     private boolean buggy;
     Row(String name) {
         this.path=name;
         this.size=0;
-        this.N_commit=0;
-        this.N_Fix=0;
-        this.Loc_Added=0;
-        this.Loc_Delete=0;
-        this.Loc_replace=0;
-        this.Max_LocAdded=0;
-        this.Churn=0;
-        this.Max_Churn=0;
-        this.N_commitRelease=0;
+        this.n_commit =0;
+        this.loc_Added =0;
+        this.loc_Delete =0;
+        this.loc_replace =0;
+        this.max_LocAdded =0;
+        this.churn =0;
+        this.max_Churn =0;
+        this.n_commitRelease =0;
         this.worker=new ArrayList<>();
         this.buggy=false;
 
@@ -38,15 +37,14 @@ public class Row {
     Row(Row riga){
         this.path=riga.getPath();
         this.size=riga.getSize();
-        this.N_commit= riga.getN_commit();
-        this.N_commitRelease=0;
-        this.N_Fix=0;
-        this.Loc_Added=0;
-        this.Loc_Delete=0;
-        this.Loc_replace=0;
-        this.Max_LocAdded=0;
-        this.Churn=0;
-        this.Max_Churn=0;
+        this.n_commit = riga.getNcommit();
+        this.n_commitRelease =0;
+        this.loc_Added =0;
+        this.loc_Delete =0;
+        this.loc_replace =0;
+        this.max_LocAdded =0;
+        this.churn =0;
+        this.max_Churn =0;
         this.worker=new ArrayList<String>();
         for(String s:riga.getWorker()){
             String d=s;
@@ -55,37 +53,37 @@ public class Row {
         this.buggy= riga.isBuggy();
     }
     public void modifySizeByEdit(EditList listaEdit){
-        int A=0;
-        int R=0;
+        int a=0;
+        int r=0;
         for (Edit app:listaEdit)
         {
             this.size+= app.getLengthB()-app.getLengthA();
             if(app.getType()== Edit.Type.INSERT){
-                this.Loc_Added+=app.getLengthB();
-                A+=app.getLengthB();
-                if(this.Max_LocAdded<app.getLengthB()) this.Max_LocAdded= app.getLengthB();
+                this.loc_Added +=app.getLengthB();
+                a+=app.getLengthB();
+                if(this.max_LocAdded <app.getLengthB()) this.max_LocAdded = app.getLengthB();
             }
             if (app.getType()== Edit.Type.DELETE){
-                R+=app.getLengthA();
-                this.Loc_Delete+= app.getLengthA();
+                r+=app.getLengthA();
+                this.loc_Delete += app.getLengthA();
             }
             if(app.getType()== Edit.Type.REPLACE)
             {
                 if(app.getLengthA()> app.getLengthB()) {
-                    this.Loc_replace+=app.getLengthB();
-                    this.Loc_Delete+=app.getLengthA()-app.getLengthB();
-                    R+=app.getLengthA()-app.getLengthB();
+                    this.loc_replace +=app.getLengthB();
+                    this.loc_Delete +=app.getLengthA()-app.getLengthB();
+                    r+=app.getLengthA()-app.getLengthB();
                 }
                 else{
-                    this.Loc_replace+=app.getLengthA();
-                    this.Loc_Added+=app.getLengthB()-app.getLengthA();
-                    A+=app.getLengthB()-app.getLengthA();
-                    if(this.Max_LocAdded<app.getLengthB()) this.Max_LocAdded= app.getLengthB();
+                    this.loc_replace +=app.getLengthA();
+                    this.loc_Added +=app.getLengthB()-app.getLengthA();
+                    a+=app.getLengthB()-app.getLengthA();
+                    if(this.max_LocAdded <app.getLengthB()) this.max_LocAdded = app.getLengthB();
                 }
             }
         }
-        this.Churn+=A-R;
-        if(this.Max_Churn<A-R || this.N_commitRelease==1 ) Max_Churn=A-R;
+        this.churn +=a-r;
+        if(this.max_Churn <a-r || this.n_commitRelease ==1 ) max_Churn =a-r;
     }
 
     public String getPath() {
@@ -100,30 +98,30 @@ public class Row {
     public void setSize(int size) {
         this.size = size;
     }
-    public int getMax_LocAdded(){
-        return this.Max_LocAdded;
+    public int getMaxLocAdded(){
+        return this.max_LocAdded;
     }
-    public int getLoc_Added(){
-        return this.Loc_Added;
+    public int getLocAdded(){
+        return this.loc_Added;
     }
-    public int getAvg_LocAdded(){
-        if(this.N_commitRelease!=0)
-            return this.Loc_Added/this.N_commitRelease;
+    public int getAvgLocAdded(){
+        if(this.n_commitRelease !=0)
+            return this.loc_Added /this.n_commitRelease;
         return 0;
     }
     public void increaseNCommit(){
-        N_commit=N_commit+1;
-        this.N_commitRelease=this.N_commitRelease+1;
+        n_commit = n_commit +1;
+        this.n_commitRelease =this.n_commitRelease +1;
     }
-    public int getN_commit() {
-        return N_commit;
+    public int getNcommit() {
+        return n_commit;
     }
     public boolean isBuggy(){
         return this.buggy;
     }
     public void setN_commit(int n_commit) {
-        N_commit = n_commit;
-        N_commitRelease=n_commit;
+        this.n_commit = n_commit;
+        n_commitRelease =n_commit;
     }
 
     //controlla e aggiunge
@@ -135,46 +133,48 @@ public class Row {
         this.worker.add(n);
         return true;
     }
-    public ArrayList<String> getWorker() {
+    public List<String> getWorker() {
         return worker;
     }
-    public void setWorker(ArrayList<String> worker) {
+
+    /*public void setWorker(ArrayList<String> worker) {
         this.worker = worker;
     }
-    public int getN_LocTouched() {
-        return Loc_Added+Loc_Delete+Loc_replace;
+     */
+    public int getNLocTouched() {
+        return loc_Added + loc_Delete + loc_replace;
     }
 
     public int getChurn() {
-        return Churn;
+        return churn;
     }
 
-    public int getAVG_Churn() {
-        if(this.N_commitRelease!=0)return this.Churn/this.N_commitRelease;
+    public int getAVGChurn() {
+        if(this.n_commitRelease !=0)return this.churn /this.n_commitRelease;
         return 0;
     }
 
-    public int getMax_Churn() {
-        return Max_Churn;
+    public int getMaxChurn() {
+        return max_Churn;
     }
     public void setZero(){
-        this.Churn=0;
-        this.Max_Churn=0;
-        this.Max_LocAdded=0;
-        this.Loc_Added=0;
-        this.Loc_replace=0;
-        this.Loc_Delete=0;
-        this.N_commit=0;
+        this.churn =0;
+        this.max_Churn =0;
+        this.max_LocAdded =0;
+        this.loc_Added =0;
+        this.loc_replace =0;
+        this.loc_Delete =0;
+        this.n_commit =0;
     }
 
-    public int getN_commitRelease() {
-        return N_commitRelease;
+    public int getNcommitRelease() {
+        return n_commitRelease;
     }
 
     public void setBuggy(boolean buggy){
         this.buggy=buggy;
     }
     public void setN_commitRelease(int n_commitRelease) {
-        N_commitRelease = n_commitRelease;
+        this.n_commitRelease = n_commitRelease;
     }
 }

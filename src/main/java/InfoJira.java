@@ -32,7 +32,8 @@ public class InfoJira {
         return false;
     }
     private void sort(List <InfoVersion> s){
-            int i,j;
+            int i;
+            int j;
             int dim=s.size();
             for (i=0;i<dim;i++){
                 for (j=i;j<dim;j++)
@@ -46,7 +47,7 @@ public class InfoJira {
                 }
             }
     }
-    public  ArrayList<Bug> ListBug() throws IOException, ParseException {
+    public  List<Bug> listBug() throws IOException, ParseException {
         Integer i=0;
         Integer j=0;
         ArrayList<Bug> bug;
@@ -151,14 +152,14 @@ public class InfoJira {
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
-            JSONObject json = new JSONObject(jsonText);
-            return json;
+            return new JSONObject(jsonText);
         } finally {
             is.close();
         }
     }
-    public List<InfoVersion> ListVersion() throws IOException, JSONException, ParseException {
-        Integer j = 0, i = 0, total = 1;
+    public List<InfoVersion> listVersion() throws IOException, JSONException, ParseException {
+        Integer i = 0;
+        Integer total ;
         listVersion=new ArrayList<InfoVersion>();
         String url= "https://issues.apache.org/jira/rest/api/2/project/"+this.projName+"/version?";
         JSONObject json = readJsonFromUrl(url);

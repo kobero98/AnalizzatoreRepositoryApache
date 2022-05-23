@@ -66,7 +66,6 @@ public class gitTest2 {
         } catch (GitAPIException | JGitInternalException e) {
             git = Git.open(f);
                 git.pull().call();
-
         }
         try {
             List<Ref> t = git.tagList().call();
@@ -74,16 +73,12 @@ public class gitTest2 {
             throw new RuntimeException(e);
         }
         Iterable<RevCommit> log = null;
-        try {
-            log = git.log().call();
-        } catch (GitAPIException e) {
-            e.printStackTrace();
-        }
+        log = git.log().call();
         InfoJira t = new InfoJira();
         CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
         writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
-        List<InfoVersion> stringList = t.ListVersion();
-        ArrayList<Bug> listBug=t.ListBug();
+        List<InfoVersion> stringList = t.listVersion();
+        List<Bug> listBug=t.listBug();
         stringList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
         int i = 0;
         List<RevCommit> ListCommit = new ArrayList<RevCommit>();
