@@ -105,7 +105,7 @@ public class infoJira {
                             b = new Bug(name, fixedList, affectedList);
                         } else {
                             int av = this.listVersion.indexOf(b.affected);
-                            propotion.getPropotion().increment((fv - av) / (fv - ov));
+                            propotion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
                         }
                         if (b.distance() != 0) bug.add(b);
                     }

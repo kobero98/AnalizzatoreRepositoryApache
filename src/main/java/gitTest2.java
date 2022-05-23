@@ -46,19 +46,14 @@ public class gitTest2 {
         }
         return null;
     }
-    private static void setBuggy(Bug b,ArrayList<ARFFList> list,List<infoVersion> versions,String path){
-        System.out.println("INIZIO");
+    private static void setBuggy(Bug b,List<ARFFList> list,List<infoVersion> versions,String path){
         if(b==null) return;
         int inizio= versions.indexOf(b.affected);
-        System.out.println(inizio +"---"+b.affected);
         int fine=versions.indexOf(b.fixed)-1;
-        System.out.println(fine +"---"+b.fixed);
         for (int k=inizio;k<fine && k<list.size()-1;k++){
-            System.out.println(k);
             for (row r:list.get(k).getRows())
             {
-                if(r.getPath().equals(path)) {r.setBuggy(true);
-                System.out.println("true");}
+                if(r.getPath().equals(path)) r.setBuggy(true);
             }
         }
     }
@@ -87,28 +82,24 @@ public class gitTest2 {
         infoJira t = new infoJira();
         CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
         writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
-
         List<infoVersion> stringList = t.ListVersion();
         ArrayList<Bug> listBug=t.ListBug();
         stringList.add(new infoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
         int i = 0;
-        ArrayList<RevCommit> ListCommit = new ArrayList<RevCommit>();
+        List<RevCommit> ListCommit = new ArrayList<RevCommit>();
         for (RevCommit s : log) {
             ListCommit.add(s);
         }
-        ArrayList<ARFFList> listaF=new ArrayList<ARFFList>();
+        List<ARFFList> listaF=new ArrayList<ARFFList>();
         ARFFList c=new ARFFList(stringList.get(0).getS());
         listaF.add(c);
         int j;
         int k = 0;
         for (j = ListCommit.size(); j >= 1; j--) {
             RevCommit actual = null;
-            Date dataActual = null;
             boolean flag=false;
-            if (j != ListCommit.size()) {
+            if (j != ListCommit.size())
                 actual = ListCommit.get(j);
-                dataActual = actual.getCommitterIdent().getWhen();
-            }
             RevCommit success = ListCommit.get(j - 1);
             String idJira=getIDJira(success.getShortMessage());
             Bug bugCatch=bugContains(listBug,idJira);
@@ -158,7 +149,6 @@ public class gitTest2 {
                     }
                     c=new ARFFList(stringList.get(k).getS());
                     c.getRows().addAll(finta);
-                    //c.setZero();
                     listaF.add(c);
                  }
             }
@@ -168,7 +158,6 @@ public class gitTest2 {
                 }
                 writer.flush();
             }
-            RetrieveTicketsID ticket = new RetrieveTicketsID();
             writer.close();
         }
     }
