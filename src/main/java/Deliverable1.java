@@ -45,8 +45,8 @@ public class Deliverable1 {
     private static void setBuggy(Bug b, List<ARFFList> list, List<InfoVersion> versions, String path){
         if(b==null) return;
         int inizio= versions.indexOf(b.getAffected());
-        int fine=versions.indexOf(b.getFixed())-1;
-        for (int k=inizio;k<fine && k<list.size()-1;k++){
+        int fine=versions.indexOf(b.getFixed());
+        for (int k=inizio;k<fine && k<list.size();k++){
             for (Row r:list.get(k).getRows())
             {
                 if(r.getPath().equals(path)) r.setBuggy(true);
