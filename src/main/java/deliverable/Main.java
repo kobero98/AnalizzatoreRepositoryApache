@@ -6,20 +6,10 @@ import java.io.IOException;
 import java.text.ParseException;
 
 public class Main {
-    public static void main(String [] args)
-    {
+    public static void main(String [] args) throws GitAPIException, IOException, ParseException {
 
-            try {
+
                 new Deliverable1().csvFile("AVRO","https://github.com/kobero98/avro.git");
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            } catch (ParseException e) {
-                throw new RuntimeException(e);
-            } catch (GitAPIException e) {
-                throw new RuntimeException(e);
-            }
-
-
 
     }
 }
