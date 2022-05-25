@@ -89,11 +89,11 @@ public class Deliverable1 {
             }
         }
     }
-    public void csvFile(String prName,String link) throws IOException, ParseException, GitAPIException {
+    public void csvFile(String prName,String link,int version) throws IOException, ParseException, GitAPIException {
         this.projectName=prName;
         this.linkRepo=link;
         File f = new File("./Test"+projectName);
-        Git git = null;
+        Git git;
         try {
             git = Git.cloneRepository().setURI(linkRepo)
                     .setDirectory(f).setCloneAllBranches(true).call();
@@ -101,7 +101,6 @@ public class Deliverable1 {
             git = Git.open(f);
                 git.pull().call();
         }
-
         Iterable<RevCommit> log= git.log().call();
         List<RevCommit> listCommit = new ArrayList<RevCommit>();
         for (RevCommit s : log) {
@@ -110,6 +109,8 @@ public class Deliverable1 {
 
         InfoJira t = new InfoJira(projectName.toUpperCase());
         this.versionList = t.listVersion();
+        if(version<1)version=this.versionList.size();
+
         List<Bug> listBug=t.listBug();
         versionList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
         this.listaF=new ArrayList<ARFFList>();
@@ -117,7 +118,7 @@ public class Deliverable1 {
         listaF.add(c);
         int j;
         int k = 0;
-        for (j = listCommit.size(); j >= 1; j--) {
+        for (j = listCommit.size(); j >= 1 && k<version; j--) {
             RevCommit actual = null;
             if (j != listCommit.size())
                 actual = listCommit.get(j);
@@ -149,7 +150,7 @@ public class Deliverable1 {
                     listaF.add(c);
                  }
             }
-        CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
+        CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+"-"+version+".csv"));
         writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
         int i;
             for (i=0;i<listaF.size()/2;i++) {

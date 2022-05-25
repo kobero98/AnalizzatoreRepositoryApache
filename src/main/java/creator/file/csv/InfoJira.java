@@ -48,6 +48,56 @@ public class InfoJira {
                 }
             }
     }
+    private List<InfoVersion> creationFixedList(JSONArray issues,int dim,int i,String arg) throws ParseException {
+        String nome;
+        Date data;
+        ArrayList<InfoVersion> fixedList=new ArrayList<InfoVersion>();
+        for (int k=0;k<dim;k++) {
+            if(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(arg).getJSONObject(k).getBoolean("released") &&
+                    !issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(arg).getJSONObject(k).isNull(RELEASEDATE)) {
+                nome = issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(arg).getJSONObject(k).getString("name");
+                data = new SimpleDateFormat(DATAPATH).parse(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(arg).getJSONObject(k).getString(RELEASEDATE));
+                fixedList.add(new InfoVersion(data,nome));
+            }
+        }
+        return fixedList;
+    }
+    private void addBugList(JSONArray issues,int i,List<Bug> bug,Bug b) throws ParseException {
+        if (b.getFixed() != null) {
+            List<InfoVersion> affectedList=new ArrayList<InfoVersion>();
+            List<InfoVersion> fixedList=new ArrayList<InfoVersion>();
+            int ov = -1;
+            int fv = this.listVersion.indexOf(b.getFixed());
+            String opening;
+            if (!issues.getJSONObject(i % 50).getJSONObject(FIELDS).isNull("created")) {
+                opening = issues.getJSONObject(i % 50).getJSONObject(FIELDS).get("created").toString();
+                Date openingVersion = new SimpleDateFormat(DATAPATH).parse(opening);
+                InfoVersion v = searchOpening(openingVersion);
+                ov = this.listVersion.indexOf(v);
+            }
+            if (ov > -1 && ov < fv) {
+                if (b.getAffected() == null || b.distance() < 0) {
+                    double p = Proportion.getPropotion().getValor();
+                    long round = Math.round(fv - (fv - ov) * p);
+                    if ((int) round < 0) affectedList.add(this.listVersion.get(0));
+                    else affectedList.add(this.listVersion.get((int) round));
+                    fixedList.add(b.getFixed());
+                    b = new Bug(b.getName(), fixedList, affectedList);
+                    Proportion.getPropotion().increment(0);
+                } else {
+                    int av = this.listVersion.indexOf(b.getAffected());
+                    if (fv - ov != 0) Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
+                    else Proportion.getPropotion().increment(0);
+                }
+                if (b.distance() != 0) bug.add(b);
+            } else {
+                if (b.getAffected() != null && b.distance() > 0) {
+                    bug.add(b);
+                    Proportion.getPropotion().increment(0);
+                }
+            }
+        }
+    }
     public  List<Bug> listBug() throws IOException, ParseException {
         Integer i=0;
         Integer j=0;
@@ -66,61 +116,12 @@ public class InfoJira {
             for (; i < total && i<j; i++) {
                 String name = issues.getJSONObject(i%50).getString("key");
                 int dim=issues.getJSONObject(i%50).getJSONObject(FIELDS).getJSONArray(FIX).length();
-                String nome;
-                Date data;
-                ArrayList<InfoVersion> fixedList=new ArrayList<InfoVersion>();
-                for (int k=0;k<dim;k++) {
-                    if(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getBoolean("released") &&
-                            !issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).isNull(RELEASEDATE)) {
-                            nome = issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getString("name");
-                            data = new SimpleDateFormat(DATAPATH).parse(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getString(RELEASEDATE));
-                            fixedList.add(new InfoVersion(data,nome));
-                    }
-                }
-                ArrayList<InfoVersion> affectedList=new ArrayList<InfoVersion>();
+                List<InfoVersion> fixedList=creationFixedList(issues,dim,i,FIX);
                 dim=issues.getJSONObject(i%50).getJSONObject(FIELDS).getJSONArray(VERSION).length();
-                for (int k=0;k<dim;k++) {
-                    if(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).getBoolean("released") &&
-                            !issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).isNull(RELEASEDATE)) {
-                        nome= issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).getString("name");
-                        data = new SimpleDateFormat(DATAPATH).parse(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).getString(RELEASEDATE));
-                        affectedList.add(new InfoVersion(data,nome));
-                    }
-                }
+                List<InfoVersion> affectedList=creationFixedList(issues,dim,i,VERSION);
+
                 Bug b=new Bug(name,fixedList,affectedList);
-                if(b.getFixed()!=null){
-                    int ov=-1;
-                    int fv= this.listVersion.indexOf(b.getFixed());
-                    String opening;
-                    if(!issues.getJSONObject(i%50).getJSONObject(FIELDS).isNull("created")) {
-                        opening = issues.getJSONObject(i % 50).getJSONObject(FIELDS).get("created").toString();
-                        Date openingVersion = new SimpleDateFormat(DATAPATH).parse(opening);
-                        InfoVersion v = searchOpening(openingVersion);
-                        ov = this.listVersion.indexOf(v);
-                    }
-                    if(ov>-1 && ov<fv) {
-                        if (b.getAffected() == null ||b.distance() < 0) {
-                            double p = Proportion.getPropotion().getValor();
-                            long round = Math.round(fv - (fv - ov) * p);
-                            if((int) round <0)affectedList.add(this.listVersion.get(0));
-                            else affectedList.add(this.listVersion.get( (int) round));
-                            b = new Bug(name, fixedList, affectedList);
-                            Proportion.getPropotion().increment(0);
-                        } else {
-                            int av = this.listVersion.indexOf(b.getAffected());
-                            if(fv-ov!=0) Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
-                            else Proportion.getPropotion().increment(0);
-                        }
-                        if (b.distance() != 0) bug.add(b);
-                    }
-                    else{
-                        if(b.getAffected()!=null && b.distance()>0)
-                        {
-                            bug.add(b);
-                            Proportion.getPropotion().increment(0);
-                        }
-                    }
-                }
+                addBugList(issues,i,bug,b);
             }
         }while(i<total);
         return bug;
