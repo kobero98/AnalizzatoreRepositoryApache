@@ -20,8 +20,6 @@ public class InfoJira {
     private static final String RELEASEDATE="releaseDate";
     private static final String VERSION="versions";
     private static final String DATAPATH="yyyy-MM-dd";
-
-
     public InfoJira(String nome){
         this.projName=nome;
     }
@@ -62,19 +60,33 @@ public class InfoJira {
         }
         return fixedList;
     }
+    private void proportionIncrease(int fv, int ov, int av)
+    {
+        if (fv - ov != 0) Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
+        else Proportion.getPropotion().increment(0);
+    }
+    private void insertNormalBug(Bug b,List<Bug> bug){
+        if (b.getAffected() != null && b.distance() > 0) {
+            bug.add(b);
+            Proportion.getPropotion().increment(0);
+        }
+    }
+    private int openingVersion(JSONArray issues,int i) throws ParseException {
+        int ov=-1;
+        if (!issues.getJSONObject(i % 50).getJSONObject(FIELDS).isNull("created")) {
+            String opening = issues.getJSONObject(i % 50).getJSONObject(FIELDS).get("created").toString();
+            Date openingVersion = new SimpleDateFormat(DATAPATH).parse(opening);
+            InfoVersion v = searchOpening(openingVersion);
+            ov = this.listVersion.indexOf(v);
+        }
+        return ov;
+    }
     private void addBugList(JSONArray issues,int i,List<Bug> bug,Bug b) throws ParseException {
         if (b.getFixed() != null) {
             List<InfoVersion> affectedList=new ArrayList<InfoVersion>();
             List<InfoVersion> fixedList=new ArrayList<InfoVersion>();
-            int ov = -1;
             int fv = this.listVersion.indexOf(b.getFixed());
-            String opening;
-            if (!issues.getJSONObject(i % 50).getJSONObject(FIELDS).isNull("created")) {
-                opening = issues.getJSONObject(i % 50).getJSONObject(FIELDS).get("created").toString();
-                Date openingVersion = new SimpleDateFormat(DATAPATH).parse(opening);
-                InfoVersion v = searchOpening(openingVersion);
-                ov = this.listVersion.indexOf(v);
-            }
+            int ov= openingVersion(issues,i);
             if (ov > -1 && ov < fv) {
                 if (b.getAffected() == null || b.distance() < 0) {
                     double p = Proportion.getPropotion().getValor();
@@ -86,15 +98,11 @@ public class InfoJira {
                     Proportion.getPropotion().increment(0);
                 } else {
                     int av = this.listVersion.indexOf(b.getAffected());
-                    if (fv - ov != 0) Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
-                    else Proportion.getPropotion().increment(0);
+                    proportionIncrease(fv,ov,av);
                 }
                 if (b.distance() != 0) bug.add(b);
             } else {
-                if (b.getAffected() != null && b.distance() > 0) {
-                    bug.add(b);
-                    Proportion.getPropotion().increment(0);
-                }
+                insertNormalBug(b,bug);
             }
         }
     }
