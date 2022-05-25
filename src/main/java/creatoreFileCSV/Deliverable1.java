@@ -29,7 +29,7 @@ public class Deliverable1 {
     private static String linkRepo="https://github.com/kobero98/avro.git";//"https://github.com/apache/bookkeeper.git"
     private static String getIDJira(String shortestMessage){
         String s=null;
-        Pattern pattern= Pattern.compile(projectName.toUpperCase()+"-[0-9]+");
+        Pattern pattern= Pattern.compile(projectName.toUpperCase()+"-\\d+");
         Matcher matcher= pattern.matcher(shortestMessage);
         if(matcher.find()){
              s=matcher.group(0);
@@ -63,8 +63,7 @@ public class Deliverable1 {
             git = Git.open(f);
                 git.pull().call();
         }
-        Iterable<RevCommit> log = null;
-        log = git.log().call();
+        Iterable<RevCommit> log= git.log().call();
         InfoJira t = new InfoJira();
         CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
         writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
