@@ -1,4 +1,4 @@
-package creatoreFileCSV;
+package creator.file.csv;
 
 import org.eclipse.jgit.diff.Edit;
 import org.eclipse.jgit.diff.EditList;

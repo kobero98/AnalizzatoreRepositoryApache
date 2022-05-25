@@ -1,4 +1,4 @@
-package creatoreFileCSV;
+package creator.file.csv;
 
 import org.json.JSONArray;
 import org.json.JSONException;

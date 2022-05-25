@@ -1,4 +1,4 @@
-package creatoreFileCSV;
+package creator.file.csv;
 
 import com.opencsv.CSVWriter;
 import org.eclipse.jgit.api.Git;

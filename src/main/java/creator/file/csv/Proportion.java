@@ -1,4 +1,4 @@
-package creatoreFileCSV;
+package creator.file.csv;
 
 public class Proportion {
     private static Proportion me=null;

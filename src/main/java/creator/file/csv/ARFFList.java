@@ -1,4 +1,4 @@
-package creatoreFileCSV;
+package creator.file.csv;
 
 import java.util.ArrayList;
 import java.util.List;
