@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class InfoJira {
-    //private  String projName ="AVRO";
+    //private  String projName ="BOOKKEEPER";
     private  String projName="AVRO";
     private List<InfoVersion> listVersion;
 
@@ -134,8 +134,7 @@ public class InfoJira {
         try {
             BufferedReader rd = new BufferedReader(new InputStreamReader(is, Charset.forName("UTF-8")));
             String jsonText = readAll(rd);
-            JSONArray json = new JSONArray(jsonText);
-            return json;
+            return new JSONArray(jsonText);
         } finally {
             is.close();
         }
