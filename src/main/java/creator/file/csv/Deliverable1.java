@@ -55,32 +55,37 @@ public class Deliverable1 {
             }
         }
     }
-    private void funzioneDiffEntry(List<DiffEntry> listDiff,ARFFList c,Bug bugCatch,String nameAuthor,DiffFormatter formatter) throws IOException {
+    private void functionControllEntry(DiffEntry diff,ARFFList c,String nameAuthor,EditList listEdit,Bug bugCatch)
+    {
+        if (diff.getChangeType() == DiffEntry.ChangeType.ADD) {
+            Row app = new Row(diff.getNewPath());
+            app.increaseNCommit();
+            app.modifySizeByEdit(listEdit);
+            app.readyWorkerOn(nameAuthor);
+            c.add(app);
+        }
+        else {
+            if (diff.getChangeType() == DiffEntry.ChangeType.MODIFY || diff.getChangeType() == DiffEntry.ChangeType.COPY || diff.getChangeType() == DiffEntry.ChangeType.RENAME) {
+                int index = c.contains(diff.getOldPath());
+                c.getRows().get(index).setPath(diff.getNewPath());
+                c.increaseNCommit(index);
+                c.getRows().get(index).modifySizeByEdit(listEdit);
+                c.increaseWorkOnCommit(index, nameAuthor);
+                setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
+            } else {
+                if (diff.getChangeType() == DiffEntry.ChangeType.DELETE) {
+                    c.remove(diff.getOldPath());
+                    setBuggy(bugCatch, listaF, versionList, diff.getOldPath());
+                }
+            }
+        }
+    }
+
+    private void functionDiffEntry(List<DiffEntry> listDiff, ARFFList c, Bug bugCatch, String nameAuthor, DiffFormatter formatter) throws IOException {
         for (DiffEntry diff : listDiff) {
             if (diff.getNewPath().endsWith(".java") || diff.getOldPath().endsWith(".java")) {
-                EditList listEdit=formatter.toFileHeader(diff).toEditList();
-                if (diff.getChangeType() == DiffEntry.ChangeType.ADD) {
-                    Row app = new Row(diff.getNewPath());
-                    app.increaseNCommit();
-                    app.modifySizeByEdit(listEdit);
-                    app.readyWorkerOn(nameAuthor);
-                    c.add(app);
-                }
-                else {
-                    if (diff.getChangeType() == DiffEntry.ChangeType.MODIFY || diff.getChangeType() == DiffEntry.ChangeType.COPY || diff.getChangeType() == DiffEntry.ChangeType.RENAME) {
-                        int index = c.contains(diff.getOldPath());
-                        c.getRows().get(index).setPath(diff.getNewPath());
-                        c.increaseNCommit(index);
-                        c.getRows().get(index).modifySizeByEdit(listEdit);
-                        c.increaseWorkOnCommit(index, nameAuthor);
-                        setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
-                    } else {
-                        if (diff.getChangeType() == DiffEntry.ChangeType.DELETE) {
-                            c.remove(diff.getOldPath());
-                            setBuggy(bugCatch, listaF, versionList, diff.getOldPath());
-                        }
-                    }
-                }
+                EditList listEdit = formatter.toFileHeader(diff).toEditList();
+                functionControllEntry(diff, c, nameAuthor, listEdit, bugCatch);
             }
         }
     }
@@ -129,7 +134,7 @@ public class Deliverable1 {
                 try (DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
                     formatter.setRepository(git.getRepository());
                     List<DiffEntry> listDiff = formatter.scan(oldTreeIterator, newTreeIterator);
-                    funzioneDiffEntry(listDiff,c,bugCatch,nameAuthor,formatter);
+                    functionDiffEntry(listDiff,c,bugCatch,nameAuthor,formatter);
                 }
             }
             if (dataSuccess.after(versionList.get(k).getData())) {
