@@ -10,19 +10,21 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class InfoJira {
-    private  String projName ="AVRO";
+    //private  String projName ="AVRO";
+    private  String projName="AVRO";
     private List<InfoVersion> listVersion;
 
     private static final String FIX="fixVersions";
     private static final String FIELDS="fields";
     private static final String RELEASEDATE="releaseDate";
     private static final String VERSION="versions";
+    private static final String DATAPATH="yyyy-MM-dd";
 
 
     private InfoVersion searchOpening(Date d){
         for (InfoVersion s:listVersion)
         {
-            if(d.after(s.getData())) return s;
+            if(s.getData().after(d)) return s;
         }
         return null;
     }
@@ -66,9 +68,9 @@ public class InfoJira {
                 for (int k=0;k<dim;k++) {
                     if(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getBoolean("released") &&
                             !issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).isNull(RELEASEDATE)) {
-                        nome = issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getString("name");
-                        data = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getString(RELEASEDATE));
-                        fixedList.add(new InfoVersion(data,nome));
+                            nome = issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getString("name");
+                            data = new SimpleDateFormat(DATAPATH).parse(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(FIX).getJSONObject(k).getString(RELEASEDATE));
+                            fixedList.add(new InfoVersion(data,nome));
                     }
                 }
                 ArrayList<InfoVersion> affectedList=new ArrayList<InfoVersion>();
@@ -77,31 +79,31 @@ public class InfoJira {
                     if(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).getBoolean("released") &&
                             !issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).isNull(RELEASEDATE)) {
                         nome= issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).getString("name");
-                        data = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).getString(RELEASEDATE));
+                        data = new SimpleDateFormat(DATAPATH).parse(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(VERSION).getJSONObject(k).getString(RELEASEDATE));
                         affectedList.add(new InfoVersion(data,nome));
                     }
                 }
-                if(!fixedList.isEmpty()){
+                Bug b=new Bug(name,fixedList,affectedList);
+
+                if(b.getFixed()!=null){
                     int ov=-1;
-                    Bug b=new Bug(name,fixedList,affectedList);
                     int fv= this.listVersion.indexOf(b.getFixed());
                     String opening;
-                    InfoVersion v=null;
                     if(!issues.getJSONObject(i%50).getJSONObject(FIELDS).isNull("created")) {
                         opening = issues.getJSONObject(i % 50).getJSONObject(FIELDS).get("created").toString();
-                        Date openingVersion = new SimpleDateFormat("yyyy-MM-dd").parse(opening);
-                        v = searchOpening(openingVersion);
+                        Date openingVersion = new SimpleDateFormat(DATAPATH).parse(opening);
+                        InfoVersion v = searchOpening(openingVersion);
                         ov = this.listVersion.indexOf(v);
                     }
                     if(ov>-1 && ov<fv) {
-                        if (b.getAffected() == null || b.distance() < 0) {
-                            int p = Proportion.getPropotion().getValor();
-                            int index = this.listVersion.indexOf(v);
-                            affectedList.add(this.listVersion.get(fv - (fv - index) * p));
+                        if (b.getAffected() == null ||b.distance() < 0) {
+                            double p = Proportion.getPropotion().getValor();
+                            affectedList.add(this.listVersion.get( (int) Math.round(fv - (fv - ov) * p)));
                             b = new Bug(name, fixedList, affectedList);
                         } else {
-                            int av = this.listVersion.indexOf(b.getFixed());
-                            Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
+                            int av = this.listVersion.indexOf(b.getAffected());
+                            if(fv-ov!=0) Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
+                            else Proportion.getPropotion().increment(0);
                         }
                         if (b.distance() != 0) bug.add(b);
                     }
@@ -158,7 +160,7 @@ public class InfoJira {
             String name=issues.getJSONObject(i).get("name").toString();
             Date day=null;
             if(!issues.getJSONObject(i).isNull(RELEASEDATE)) {
-                day = new SimpleDateFormat("yyyy-MM-dd").parse(issues.getJSONObject(i).get(RELEASEDATE).toString());
+                day = new SimpleDateFormat(DATAPATH).parse(issues.getJSONObject(i).get(RELEASEDATE).toString());
                 InfoVersion f = new InfoVersion(day, name);
                 listVersion.add(f);
             }

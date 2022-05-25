@@ -50,37 +50,43 @@ public class Row {
             String d=s;
             this.worker.add(d);
         }
-        this.buggy= riga.isBuggy();
+        this.buggy= false;
+    }
+    private void incrementSize(Edit app,int v[]){
+        this.size+= app.getLengthB()-app.getLengthA();
+        if(app.getType()== Edit.Type.INSERT){
+            this.locAdded +=app.getLengthB();
+            v[0]+=app.getLengthB();
+            if(this.maxLocAdded <app.getLengthB()) this.maxLocAdded = app.getLengthB();
+        }
+        if (app.getType()== Edit.Type.DELETE){
+            v[1]+=app.getLengthA();
+            this.locDelete += app.getLengthA();
+        }
+        if(app.getType()== Edit.Type.REPLACE)
+        {
+            if(app.getLengthA()> app.getLengthB()) {
+                this.locReplace +=app.getLengthB();
+                this.locDelete +=app.getLengthA()-app.getLengthB();
+                v[1]+=app.getLengthA()-app.getLengthB();
+            }
+            else{
+                this.locReplace +=app.getLengthA();
+                this.locAdded +=app.getLengthB()-app.getLengthA();
+                v[0]+=app.getLengthB()-app.getLengthA();
+                if(this.maxLocAdded <app.getLengthB()) this.maxLocAdded = app.getLengthB();
+            }
+        }
     }
     public void modifySizeByEdit(EditList listaEdit){
         int a=0;
         int r=0;
         for (Edit app:listaEdit)
         {
-            this.size+= app.getLengthB()-app.getLengthA();
-            if(app.getType()== Edit.Type.INSERT){
-                this.locAdded +=app.getLengthB();
-                a+=app.getLengthB();
-                if(this.maxLocAdded <app.getLengthB()) this.maxLocAdded = app.getLengthB();
-            }
-            if (app.getType()== Edit.Type.DELETE){
-                r+=app.getLengthA();
-                this.locDelete += app.getLengthA();
-            }
-            if(app.getType()== Edit.Type.REPLACE)
-            {
-                if(app.getLengthA()> app.getLengthB()) {
-                    this.locReplace +=app.getLengthB();
-                    this.locDelete +=app.getLengthA()-app.getLengthB();
-                    r+=app.getLengthA()-app.getLengthB();
-                }
-                else{
-                    this.locReplace +=app.getLengthA();
-                    this.locAdded +=app.getLengthB()-app.getLengthA();
-                    a+=app.getLengthB()-app.getLengthA();
-                    if(this.maxLocAdded <app.getLengthB()) this.maxLocAdded = app.getLengthB();
-                }
-            }
+            int v[]={0,0};
+            incrementSize(app,v);
+            a+=v[0];
+            r+=v[1];
         }
         this.churn +=a-r;
         if(this.maxChurn <a-r || this.nCommitRelease ==1 ) maxChurn =a-r;

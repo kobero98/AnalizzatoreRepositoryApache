@@ -14,8 +14,8 @@ public class Proportion {
         durata=durata+d;
         n=n+1;
     }
-    public int getValor(){
+    public double getValor(){
        if(n==0) return 0;
-       return (int) Math.round(durata/n);
+       return  durata/n;
     }
 }

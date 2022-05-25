@@ -26,6 +26,8 @@ public class Deliverable1 {
     private static String projectName="Avro";
     private static String linkRepo="https://github.com/kobero98/avro.git";
 
+    //private static String projectName="Bookkeeper";
+    //private static String linkRepo="https://github.com/apache/bookkeeper.git";
 
     private static String getIDJira(String shortestMessage){
         String s=null;
@@ -46,7 +48,7 @@ public class Deliverable1 {
         if(b==null) return;
         int inizio= versions.indexOf(b.getAffected());
         int fine=versions.indexOf(b.getFixed());
-        for (int k=inizio;k<fine && k<list.size();k++){
+        for (int k=inizio;k<fine && k<list.size()-1;k++){
             for (Row r:list.get(k).getRows())
             {
                 if(r.getPath().equals(path)) r.setBuggy(true);
@@ -116,8 +118,10 @@ public class Deliverable1 {
                                     c.increaseWorkOnCommit(index, nameAuthor);
                                     setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
                                 } else {
-                                    if (diff.getChangeType() == DiffEntry.ChangeType.DELETE) c.remove(diff.getOldPath());
-                                    setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
+                                    if (diff.getChangeType() == DiffEntry.ChangeType.DELETE) {
+                                        c.remove(diff.getOldPath());
+                                        setBuggy(bugCatch, listaF, versionList, diff.getOldPath());
+                                    }
                                 }
                             }
                         }
@@ -136,7 +140,9 @@ public class Deliverable1 {
                     listaF.add(c);
                  }
             }
-            for (ARFFList appoggio:listaF) {
+            int i;
+            for (i=0;i<listaF.size()/2;i++) {
+                ARFFList appoggio=listaF.get(i);
                 for (String[] s : appoggio.toArrayString()) {
                     writer.writeNext(s);
                 }

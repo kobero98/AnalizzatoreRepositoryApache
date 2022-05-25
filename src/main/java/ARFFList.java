@@ -67,9 +67,4 @@ public class ARFFList {
         }
         return list;
     }
-    public void setZero(){
-        for (Row s:this.rows){
-            s.setZero();
-        }
-    }
 }

@@ -41,12 +41,12 @@ public class Bug {
         }
         fixed=new InfoVersion(max.getData(),max.getS());
         if(affectedList.isEmpty()) return;
-        max=affectedList.get(0);
+        InfoVersion min=affectedList.get(0);
         for (InfoVersion app:affectedList)
         {
-            if(max.getData().after(app.getData())) max=app;
+            if(min.getData().after(app.getData())) min=app;
         }
-        affected=new InfoVersion(max.getData(),max.getS());
+        affected=new InfoVersion(min.getData(),min.getS());
     }
     public int distance(){
         return this.fixed.getData().compareTo(this.affected.getData());
