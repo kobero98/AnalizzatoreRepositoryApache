@@ -1,3 +1,5 @@
+package CreatoreFileCSV;
+
 public class Proportion {
     private static Proportion me=null;
     private int n;
