@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class InfoJira {
-    private  String projName="AVRO";//BOOKKEEPER
+    private  String projName="BOOKKEEPER";//AVRO
     private List<InfoVersion> listVersion;
 
     private static final String FIX="fixVersions";
@@ -53,7 +53,7 @@ public class InfoJira {
         int total=1;
         do{
             String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22"
-                    + projName + "%22AND%20affectedVersion%20%20is%20not%20EMPTY%20AND%20fixVersion%20is%20not%20EMPTY%20%20AND%20type%20%3D%20Bug%20AND%20(status%20%3D%20Closed%20OR%20status%20%3DResolved)%20" +
+                    + projName + "%22AND%20fixVersion%20is%20not%20EMPTY%20%20AND%20type%20%3D%20Bug%20AND%20(status%20%3D%20Closed%20OR%20status%20%3DResolved)%20" +
                     "&fields=key,fixVersions,versions,created,resolution&&startAt="
                     + j.toString();
             j=i+50;
@@ -85,7 +85,6 @@ public class InfoJira {
                     }
                 }
                 Bug b=new Bug(name,fixedList,affectedList);
-
                 if(b.getFixed()!=null){
                     int ov=-1;
                     int fv= this.listVersion.indexOf(b.getFixed());
@@ -99,8 +98,11 @@ public class InfoJira {
                     if(ov>-1 && ov<fv) {
                         if (b.getAffected() == null ||b.distance() < 0) {
                             double p = Proportion.getPropotion().getValor();
-                            affectedList.add(this.listVersion.get( (int) Math.round(fv - (fv - ov) * p)));
+                            long round = Math.round(fv - (fv - ov) * p);
+                            if((int) round <0)affectedList.add(this.listVersion.get(0));
+                            else affectedList.add(this.listVersion.get( (int) round));
                             b = new Bug(name, fixedList, affectedList);
+                            Proportion.getPropotion().increment(0);
                         } else {
                             int av = this.listVersion.indexOf(b.getAffected());
                             if(fv-ov!=0) Proportion.getPropotion().increment(((double) (fv - av)) / (fv - ov));
@@ -112,6 +114,7 @@ public class InfoJira {
                         if(b.getAffected()!=null && b.distance()>0)
                         {
                             bug.add(b);
+                            Proportion.getPropotion().increment(0);
                         }
                     }
                 }
