@@ -54,7 +54,7 @@ public class Row {
         }
         this.buggy= false;
     }
-    private void incrementSize(Edit app,int v[]){
+    private void incrementSize(Edit app,int []v){
         this.size+= app.getLengthB()-app.getLengthA();
         if(app.getType()== Edit.Type.INSERT){
             this.locAdded +=app.getLengthB();
@@ -85,7 +85,7 @@ public class Row {
         int r=0;
         for (Edit app:listaEdit)
         {
-            int v[]={0,0};
+            int []v={0,0};
             incrementSize(app,v);
             a+=v[0];
             r+=v[1];
@@ -165,24 +165,12 @@ public class Row {
     public int getMaxChurn() {
         return maxChurn;
     }
-    public void setZero(){
-        this.churn =0;
-        this.maxChurn =0;
-        this.maxLocAdded =0;
-        this.locAdded =0;
-        this.locReplace =0;
-        this.locDelete =0;
-        this.nCommit =0;
-    }
 
     public int getNcommitRelease() {
         return nCommitRelease;
     }
 
-    public void setBuggy(boolean buggy){
-        this.buggy=buggy;
-    }
-    public void setnCommitRelease(int nCommitRelease) {
-        this.nCommitRelease = nCommitRelease;
+    public void setBuggy(boolean buggy) {
+        this.buggy = buggy;
     }
 }
