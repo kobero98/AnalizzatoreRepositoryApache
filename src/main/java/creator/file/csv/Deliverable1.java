@@ -25,9 +25,11 @@ import java.util.regex.Pattern;
 
 
 public class Deliverable1 {
-    private static String projectName="Bookkeeper";//"Avro"
-    private static String linkRepo="https://github.com/apache/bookkeeper.git";//"https://github.com/kobero98/avro.git"
-    private static String getIDJira(String shortestMessage){
+    private  String projectName;
+    private List<ARFFList> listaF;
+    private List<InfoVersion> versionList;
+    private  String linkRepo;//"https://github.com/apache/bookkeeper.git";//"https://github.com/kobero98/avro.git"
+    private  String getIDJira(String shortestMessage){
         String s=null;
         Pattern pattern= Pattern.compile(projectName.toUpperCase()+"-\\d+");
         Matcher matcher= pattern.matcher(shortestMessage);
@@ -36,13 +38,13 @@ public class Deliverable1 {
         }
         return s;
     }
-    private static Bug bugContains(List<Bug> list, String id){
+    private Bug bugContains(List<Bug> list, String id){
         for (Bug b:list){
             if(b.getName().equals(id)) return b;
         }
         return null;
     }
-    private static void setBuggy(Bug b, List<ARFFList> list, List<InfoVersion> versions, String path){
+    private void setBuggy(Bug b, List<ARFFList> list, List<InfoVersion> versions, String path){
         if(b==null) return;
         int inizio= versions.indexOf(b.getAffected());
         int fine=versions.indexOf(b.getFixed());
@@ -53,7 +55,38 @@ public class Deliverable1 {
             }
         }
     }
-    public static void main(String[] arg) throws IOException, ParseException, GitAPIException {
+    private void funzioneDiffEntry(List<DiffEntry> listDiff,ARFFList c,Bug bugCatch,String nameAuthor,DiffFormatter formatter) throws IOException {
+        for (DiffEntry diff : listDiff) {
+            if (diff.getNewPath().endsWith(".java") || diff.getOldPath().endsWith(".java")) {
+                EditList listEdit=formatter.toFileHeader(diff).toEditList();
+                if (diff.getChangeType() == DiffEntry.ChangeType.ADD) {
+                    Row app = new Row(diff.getNewPath());
+                    app.increaseNCommit();
+                    app.modifySizeByEdit(listEdit);
+                    app.readyWorkerOn(nameAuthor);
+                    c.add(app);
+                }
+                else {
+                    if (diff.getChangeType() == DiffEntry.ChangeType.MODIFY || diff.getChangeType() == DiffEntry.ChangeType.COPY || diff.getChangeType() == DiffEntry.ChangeType.RENAME) {
+                        int index = c.contains(diff.getOldPath());
+                        c.getRows().get(index).setPath(diff.getNewPath());
+                        c.increaseNCommit(index);
+                        c.getRows().get(index).modifySizeByEdit(listEdit);
+                        c.increaseWorkOnCommit(index, nameAuthor);
+                        setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
+                    } else {
+                        if (diff.getChangeType() == DiffEntry.ChangeType.DELETE) {
+                            c.remove(diff.getOldPath());
+                            setBuggy(bugCatch, listaF, versionList, diff.getOldPath());
+                        }
+                    }
+                }
+            }
+        }
+    }
+    public void csvFile(String prName,String link) throws IOException, ParseException, GitAPIException {
+        this.projectName=prName;
+        this.linkRepo=link;
         File f = new File("./Test"+projectName);
         Git git = null;
         try {
@@ -63,18 +96,18 @@ public class Deliverable1 {
             git = Git.open(f);
                 git.pull().call();
         }
+
         Iterable<RevCommit> log= git.log().call();
-        InfoJira t = new InfoJira();
-        CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
-        writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
-        List<InfoVersion> versionList = t.listVersion();
-        List<Bug> listBug=t.listBug();
-        versionList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
         List<RevCommit> listCommit = new ArrayList<RevCommit>();
         for (RevCommit s : log) {
             listCommit.add(s);
         }
-        List<ARFFList> listaF=new ArrayList<ARFFList>();
+
+        InfoJira t = new InfoJira(projectName.toUpperCase());
+        this.versionList = t.listVersion();
+        List<Bug> listBug=t.listBug();
+        versionList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
+        this.listaF=new ArrayList<ARFFList>();
         ARFFList c=new ARFFList(versionList.get(0).getS());
         listaF.add(c);
         int j;
@@ -96,35 +129,9 @@ public class Deliverable1 {
                 try (DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {
                     formatter.setRepository(git.getRepository());
                     List<DiffEntry> listDiff = formatter.scan(oldTreeIterator, newTreeIterator);
-                    for (DiffEntry diff : listDiff) {
-                        if (diff.getNewPath().endsWith(".java") || diff.getOldPath().endsWith(".java")) {
-                            EditList listEdit=formatter.toFileHeader(diff).toEditList();
-                            if (diff.getChangeType() == DiffEntry.ChangeType.ADD) {
-                                Row app = new Row(diff.getNewPath());
-                                app.increaseNCommit();
-                                app.modifySizeByEdit(listEdit);
-                                app.readyWorkerOn(nameAuthor);
-                                c.add(app);
-                                }
-                            else {
-                                if (diff.getChangeType() == DiffEntry.ChangeType.MODIFY || diff.getChangeType() == DiffEntry.ChangeType.COPY || diff.getChangeType() == DiffEntry.ChangeType.RENAME) {
-                                    int index = c.contains(diff.getOldPath());
-                                    c.getRows().get(index).setPath(diff.getNewPath());
-                                    c.increaseNCommit(index);
-                                    c.getRows().get(index).modifySizeByEdit(listEdit);
-                                    c.increaseWorkOnCommit(index, nameAuthor);
-                                    setBuggy(bugCatch,listaF,versionList,diff.getOldPath());
-                                } else {
-                                    if (diff.getChangeType() == DiffEntry.ChangeType.DELETE) {
-                                        c.remove(diff.getOldPath());
-                                        setBuggy(bugCatch, listaF, versionList, diff.getOldPath());
-                                    }
-                                }
-                            }
-                        }
-                    }
+                    funzioneDiffEntry(listDiff,c,bugCatch,nameAuthor,formatter);
                 }
-                }
+            }
             if (dataSuccess.after(versionList.get(k).getData())) {
                     k++;
                     ArrayList<Row> finta=new ArrayList<>();
@@ -137,7 +144,9 @@ public class Deliverable1 {
                     listaF.add(c);
                  }
             }
-            int i;
+        CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+".csv"));
+        writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
+        int i;
             for (i=0;i<listaF.size()/2;i++) {
                 ARFFList appoggio=listaF.get(i);
                 for (String[] s : appoggio.toArrayString()) {

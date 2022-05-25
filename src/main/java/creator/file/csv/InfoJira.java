@@ -22,6 +22,9 @@ public class InfoJira {
     private static final String DATAPATH="yyyy-MM-dd";
 
 
+    public InfoJira(String nome){
+        this.projName=nome;
+    }
     private InfoVersion searchOpening(Date d){
         for (InfoVersion s:listVersion)
         {
