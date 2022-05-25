@@ -12,8 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 public class InfoJira {
-    //private  String projName ="BOOKKEEPER";
-    private  String projName="AVRO";
+    private  String projName="AVRO";//BOOKKEEPER
     private List<InfoVersion> listVersion;
 
     private static final String FIX="fixVersions";

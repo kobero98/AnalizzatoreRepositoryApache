@@ -25,12 +25,8 @@ import java.util.regex.Pattern;
 
 
 public class Deliverable1 {
-    private static String projectName="Avro";
-    private static String linkRepo="https://github.com/kobero98/avro.git";
-
-    //private static String projectName="Bookkeeper";
-    //private static String linkRepo="https://github.com/apache/bookkeeper.git";
-
+    private static String projectName="Avro";//"Bookkeeper"
+    private static String linkRepo="https://github.com/kobero98/avro.git";//"https://github.com/apache/bookkeeper.git"
     private static String getIDJira(String shortestMessage){
         String s=null;
         Pattern pattern= Pattern.compile(projectName.toUpperCase()+"-[0-9]+");
