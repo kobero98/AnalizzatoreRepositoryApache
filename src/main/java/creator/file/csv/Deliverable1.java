@@ -80,6 +80,19 @@ public class Deliverable1 {
             }
         }
     }
+    private void printOnFile(String path) throws IOException {
+        CSVWriter writer = new CSVWriter(new FileWriter(path));
+        writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
+        int i;
+        for (i=0;i<listaF.size()/2;i++) {
+            ARFFList appoggio=listaF.get(i);
+            for (String[] s : appoggio.toArrayString()) {
+                writer.writeNext(s);
+            }
+            writer.flush();
+        }
+        writer.close();
+    }
 
     private void functionDiffEntry(List<DiffEntry> listDiff, ARFFList c, Bug bugCatch, String nameAuthor, DiffFormatter formatter) throws IOException {
         for (DiffEntry diff : listDiff) {
@@ -88,6 +101,14 @@ public class Deliverable1 {
                 functionControllEntry(diff, c, nameAuthor, listEdit, bugCatch);
             }
         }
+    }
+    private List<RevCommit> listCreationCommit(Git git) throws GitAPIException {
+        Iterable<RevCommit> log= git.log().call();
+        List<RevCommit> listCommit =new ArrayList<RevCommit>();
+        for (RevCommit s : log) {
+            listCommit.add(s);
+        }
+        return listCommit;
     }
     public void csvFile(String prName,String link,int version) throws IOException, ParseException, GitAPIException {
         this.projectName=prName;
@@ -101,15 +122,10 @@ public class Deliverable1 {
             git = Git.open(f);
                 git.pull().call();
         }
-        Iterable<RevCommit> log= git.log().call();
-        List<RevCommit> listCommit = new ArrayList<RevCommit>();
-        for (RevCommit s : log) {
-            listCommit.add(s);
-        }
-
+        List<RevCommit> listCommit =listCreationCommit(git);
         InfoJira t = new InfoJira(projectName.toUpperCase());
         this.versionList = t.listVersion();
-        if(version<1)version=this.versionList.size();
+        if(version<1) version=this.versionList.size();
 
         List<Bug> listBug=t.listBug();
         versionList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
@@ -150,16 +166,6 @@ public class Deliverable1 {
                     listaF.add(c);
                  }
             }
-        CSVWriter writer = new CSVWriter(new FileWriter("/Users/kobero/Desktop/"+projectName+"-"+version+".csv"));
-        writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
-        int i;
-            for (i=0;i<listaF.size()/2;i++) {
-                ARFFList appoggio=listaF.get(i);
-                for (String[] s : appoggio.toArrayString()) {
-                    writer.writeNext(s);
-                }
-                writer.flush();
-            }
-            writer.close();
+            printOnFile("/Users/kobero/Desktop/"+projectName+"_"+version+".csv");
         }
     }
