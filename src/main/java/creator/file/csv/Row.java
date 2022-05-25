@@ -144,11 +144,6 @@ public class Row {
     public List<String> getWorker() {
         return worker;
     }
-
-    /*public void setWorker(ArrayList<String> worker) {
-        this.worker = worker;
-    }
-     */
     public int getNLocTouched() {
         return locAdded + locDelete + locReplace;
     }
