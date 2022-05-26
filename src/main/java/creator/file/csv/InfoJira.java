@@ -49,7 +49,7 @@ public class InfoJira {
     private List<InfoVersion> creationFixedList(JSONArray issues,int dim,int i,String arg) throws ParseException {
         String nome;
         Date data;
-        ArrayList<InfoVersion> fixedList=new ArrayList<InfoVersion>();
+        ArrayList<InfoVersion> fixedList=new ArrayList<>();
         for (int k=0;k<dim;k++) {
             if(issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(arg).getJSONObject(k).getBoolean("released") &&
                     !issues.getJSONObject(i % 50).getJSONObject(FIELDS).getJSONArray(arg).getJSONObject(k).isNull(RELEASEDATE)) {
@@ -83,8 +83,8 @@ public class InfoJira {
     }
     private void addBugList(JSONArray issues,int i,List<Bug> bug,Bug b) throws ParseException {
         if (b.getFixed() != null) {
-            List<InfoVersion> affectedList=new ArrayList<InfoVersion>();
-            List<InfoVersion> fixedList=new ArrayList<InfoVersion>();
+            List<InfoVersion> affectedList=new ArrayList<>();
+            List<InfoVersion> fixedList=new ArrayList<>();
             int fv = this.listVersion.indexOf(b.getFixed());
             int ov= openingVersion(issues,i);
             if (ov > -1 && ov < fv) {
@@ -110,7 +110,7 @@ public class InfoJira {
         Integer i=0;
         Integer j=0;
         ArrayList<Bug> bug;
-        bug = new ArrayList<Bug>();
+        bug = new ArrayList<>();
         int total=1;
         do{
             String url = "https://issues.apache.org/jira/rest/api/2/search?jql=project=%22"

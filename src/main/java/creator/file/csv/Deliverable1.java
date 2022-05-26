@@ -106,7 +106,7 @@ public class Deliverable1 {
     }
     private List<RevCommit> listCreationCommit(Git git) throws GitAPIException {
         Iterable<RevCommit> log= git.log().call();
-        List<RevCommit> listCommit =new ArrayList<RevCommit>();
+        List<RevCommit> listCommit =new ArrayList<>();
         for (RevCommit s : log) {
             listCommit.add(s);
         }
@@ -131,7 +131,7 @@ public class Deliverable1 {
 
         List<Bug> listBug=t.listBug();
         versionList.add(new InfoVersion(Date.from(Instant.now()), "VersionAncoraNonConosciuta"));
-        this.listaF=new ArrayList<ARFFList>();
+        this.listaF=new ArrayList<>();
         ARFFList c=new ARFFList(versionList.get(0).getS());
         listaF.add(c);
         int j;
