@@ -81,17 +81,19 @@ public class Deliverable1 {
         }
     }
     private void printOnFile(String path) throws IOException {
-        CSVWriter writer = new CSVWriter(new FileWriter(path));
-        writer.writeNext(new String[]{"Release","Path","Size","Numero_Commit","Numero_commit_Release","Numero_Lavoratori","LOC_TOUCHED","LOC_Added","Max_LOC_Added","AVG_LOCADDED","Churn","Max_Churn","Avg_Churn","IsBuggy"});
-        int i;
-        for (i=0;i<listaF.size()/2;i++) {
-            ARFFList appoggio=listaF.get(i);
-            for (String[] s : appoggio.toArrayString()) {
-                writer.writeNext(s);
+
+        try(CSVWriter writer = new CSVWriter(new FileWriter(path))) {
+            writer.writeNext(new String[]{"Release", "Path", "Size", "Numero_Commit", "Numero_commit_Release", "Numero_Lavoratori", "LOC_TOUCHED", "LOC_Added", "Max_LOC_Added", "AVG_LOCADDED", "Churn", "Max_Churn", "Avg_Churn", "IsBuggy"});
+            int i;
+            for (i = 0; i < listaF.size() / 2; i++) {
+                ARFFList appoggio = listaF.get(i);
+                for (String[] s : appoggio.toArrayString()) {
+                    writer.writeNext(s);
+                }
+                writer.flush();
             }
-            writer.flush();
         }
-        writer.close();
+
     }
 
     private void functionDiffEntry(List<DiffEntry> listDiff, ARFFList c, Bug bugCatch, String nameAuthor, DiffFormatter formatter) throws IOException {
@@ -145,7 +147,7 @@ public class Deliverable1 {
             Date dataSuccess = success.getCommitterIdent().getWhen();
             try (ObjectReader reader = git.getRepository().newObjectReader()) {
                 AbstractTreeIterator oldTreeIterator = new EmptyTreeIterator();
-                if (j != listCommit.size())
+                if (actual != null)
                     oldTreeIterator = new CanonicalTreeParser(null, reader, actual.getTree().getId());
                 AbstractTreeIterator newTreeIterator = new CanonicalTreeParser(null, reader, success.getTree().getId());
                 try (DiffFormatter formatter = new DiffFormatter(DisabledOutputStream.INSTANCE)) {

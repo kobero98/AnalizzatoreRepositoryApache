@@ -32,7 +32,7 @@ public class InfoVersion {
     }
     @Override
     public boolean equals(Object obj) {
-
+        if(obj==null) return false;
         if(obj.getClass()==this.getClass()) 
             return ((InfoVersion) obj).getS().equals(this.getS());
         return false;
