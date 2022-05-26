@@ -71,6 +71,9 @@ public class InfoJira {
             Proportion.getPropotion().increment(0);
         }
     }
+    private void insertOpeningVersionBug(Bug b,List<Bug> bug){
+        if (b.distance() != 0) bug.add(b);
+    }
     private int openingVersion(JSONArray issues,int i) throws ParseException {
         int ov=-1;
         if (!issues.getJSONObject(i % 50).getJSONObject(FIELDS).isNull("created")) {
@@ -100,7 +103,7 @@ public class InfoJira {
                     int av = this.listVersion.indexOf(b.getAffected());
                     proportionIncrease(fv,ov,av);
                 }
-                if (b.distance() != 0) bug.add(b);
+                insertOpeningVersionBug(b,bug);
             } else {
                 insertNormalBug(b,bug);
             }
