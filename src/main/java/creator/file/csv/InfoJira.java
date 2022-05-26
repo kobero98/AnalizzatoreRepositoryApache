@@ -6,7 +6,6 @@ import org.json.JSONObject;
 
 import java.io.*;
 import java.net.URL;
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -168,7 +167,7 @@ public class InfoJira {
     public List<InfoVersion> listVersion() throws IOException, JSONException, ParseException {
         Integer i = 0;
         Integer total ;
-        listVersion=new ArrayList<InfoVersion>();
+        listVersion=new ArrayList<>();
         String url= "https://issues.apache.org/jira/rest/api/2/project/"+this.projName+"/version?";
         JSONObject json = readJsonFromUrl(url);
         JSONArray issues = json.getJSONArray("values");

@@ -47,7 +47,7 @@ public class Row {
         this.maxLocAdded =0;
         this.churn =0;
         this.maxChurn =0;
-        this.worker=new ArrayList<String>();
+        this.worker=new ArrayList<>();
         for(String s:riga.getWorker()){
             String d=s;
             this.worker.add(d);

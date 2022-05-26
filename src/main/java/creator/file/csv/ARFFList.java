@@ -44,7 +44,7 @@ public class ARFFList {
     }
     public List<String []> toArrayString(){
 
-        ArrayList<String[]> list=new ArrayList<String[]>();
+        ArrayList<String[]> list=new ArrayList<>();
         for (int i = 0; i< rows.size(); i++)
         {
             String[] x={
