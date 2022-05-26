@@ -27,8 +27,7 @@ import java.util.regex.Pattern;
 public class Deliverable1 {
     private  String projectName;
     private List<ARFFList> listaF;
-    private List<InfoVersion> versionList;
-    private  String linkRepo;//"https://github.com/apache/bookkeeper.git";//"https://github.com/kobero98/avro.git"
+    private List<InfoVersion> versionList;//"https://github.com/apache/bookkeeper.git";//"https://github.com/kobero98/avro.git"
     private  String getIDJira(String shortestMessage){
         String s=null;
         Pattern pattern= Pattern.compile(projectName.toUpperCase()+"-\\d+");
@@ -114,11 +113,10 @@ public class Deliverable1 {
     }
     public void csvFile(String prName,String link,int version) throws IOException, ParseException, GitAPIException {
         this.projectName=prName;
-        this.linkRepo=link;
         File f = new File("./Test"+projectName);
         Git git;
         try {
-            git = Git.cloneRepository().setURI(linkRepo)
+            git = Git.cloneRepository().setURI(link)
                     .setDirectory(f).setCloneAllBranches(true).call();
         } catch (GitAPIException | JGitInternalException e) {
             git = Git.open(f);
