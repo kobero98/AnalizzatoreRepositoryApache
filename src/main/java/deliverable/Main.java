@@ -1,14 +1,22 @@
 package deliverable;
 
+import creator.file.csv.ARFFList;
 import creator.file.csv.Deliverable1;
-import org.eclipse.jgit.api.errors.GitAPIException;
-import java.io.IOException;
-import java.text.ParseException;
+
+import java.util.List;
 
 public class Main {
-    public static void main(String [] args) throws GitAPIException, IOException, ParseException {
-        new Deliverable1().csvFile("Avro","https://github.com/kobero98/avro.git",0);
-        new Deliverable1().csvFile("Bookkeeper","https://github.com/kobero98/bookkeeper.git",0);
+    private static final String prName="Avro";
+    private static final String link="https://github.com/kobero98/avro.git";
+    public static void main(String [] args) throws Exception {
+        Deliverable1 d=new Deliverable1();
+        List<ARFFList> testingSet =d.obtainARFFList(prName,link,0);
+        d.printTestingSet(testingSet);
+        for (int i=1;i<testingSet.size()/2;i++)
+        {
+            List<ARFFList> training=d.obtainARFFList(prName,link,i);
+            d.printTraningSet(training,prName+"_"+i);
+        }
 
     }
 }

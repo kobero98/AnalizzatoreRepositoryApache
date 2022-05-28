@@ -1,6 +1,5 @@
 package creator.file.csv;
 
-import com.opencsv.CSVWriter;
 import org.eclipse.jgit.api.Git;
 import org.eclipse.jgit.api.errors.*;
 import org.eclipse.jgit.diff.DiffEntry;
@@ -79,17 +78,73 @@ public class Deliverable1 {
             }
         }
     }
-    private void printOnFile(String path) throws IOException {
 
-        try(CSVWriter writer = new CSVWriter(new FileWriter(path))) {
-            writer.writeNext(new String[]{"Release", "Path", "Size", "Numero_Commit", "Numero_commit_Release", "Numero_Lavoratori", "LOC_TOUCHED", "LOC_Added", "Max_LOC_Added", "AVG_LOCADDED", "Churn", "Max_Churn", "Avg_Churn", "IsBuggy"});
-            int i;
-            for (i = 0; i < listaF.size() / 2; i++) {
-                ARFFList appoggio = listaF.get(i);
-                for (String[] s : appoggio.toArrayString()) {
-                    writer.writeNext(s);
+    public void printTraningSet(List<ARFFList> listaF, String prName) throws IOException {
+        File directory=new File("./trainingSet"+projectName);
+        directory.mkdir();
+        File file=new File("./trainingSet"+projectName+"/"+prName+".arff");
+        try(FileWriter writer=new FileWriter(file)){
+            writer.write("@relation "+projectName);
+            writer.write("\n");
+            writer.write("@attribute Size numeric\n");
+            writer.write("@attribute N_Commit numeric\n");
+            writer.write("@attribute N_Commit_Release numeric\n");
+            writer.write("@attribute N_Dev numeric\n");
+            writer.write("@attribute LOC_Touched numeric\n");
+            writer.write("@attribute LOC_Added numeric\n");
+            writer.write("@attribute Max_LOC_Added numeric\n");
+            writer.write("@attribute AVG_LOC_Added numeric\n");
+            writer.write("@attribute Churn numeric\n");
+            writer.write("@attribute Max_Churn numeric\n");
+            writer.write("@attribute Avg_Churn numeric\n");
+            writer.write("@attribute IsBuggy {false,true}\n");
+            writer.write("@data\n");
+            for (ARFFList app:listaF.subList(0,listaF.size()-2))
+            {
+                for (String[] stringArray:app.toArrayString()){
+                    int i;
+                    for (i=2;i<stringArray.length-1;i++){
+                        writer.write(stringArray[i]);
+                        writer.write(",");
+                    }
+                    writer.write(stringArray[i]);
+                    writer.write("\n");
                 }
-                writer.flush();
+            }
+        }
+    }
+    public void printTestingSet(List<ARFFList> arffLists) throws IOException {
+        File directory=new File("./TestingSet_"+projectName);
+        directory.mkdir();
+        for(int i=0;i<arffLists.size()-1;i++){
+            String path="./TestingSet_"+projectName+"/"+projectName+"_"+i+".arff";
+            File file=new File(path);
+            try(FileWriter writer=new FileWriter(file)){
+                writer.write("@relation "+projectName);
+                writer.write("\n");
+                writer.write("@attribute Size numeric\n");
+                writer.write("@attribute N_Commit numeric\n");
+                writer.write("@attribute N_Commit_Release numeric\n");
+                writer.write("@attribute N_Dev numeric\n");
+                writer.write("@attribute LOC_Touched numeric\n");
+                writer.write("@attribute LOC_Added numeric\n");
+                writer.write("@attribute Max_LOC_Added numeric\n");
+                writer.write("@attribute AVG_LOC_Added numeric\n");
+                writer.write("@attribute Churn numeric\n");
+                writer.write("@attribute Max_Churn numeric\n");
+                writer.write("@attribute Avg_Churn numeric\n");
+                writer.write("@attribute IsBuggy {false,true}\n");
+                writer.write("@data\n");
+                ARFFList app= arffLists.get(i);
+                for (String[] stringArray:app.toArrayString()){
+                    int j;
+                    for (j=2;j<stringArray.length-1;j++){
+                        writer.write(stringArray[j]);
+                        writer.write(",");
+                    }
+                    writer.write(stringArray[j]);
+                    writer.write("\n");
+                }
             }
         }
 
@@ -111,7 +166,7 @@ public class Deliverable1 {
         }
         return listCommit;
     }
-    public void csvFile(String prName,String link,int version) throws IOException, ParseException, GitAPIException {
+    public List<ARFFList> obtainARFFList(String prName, String link, int version) throws IOException, ParseException, GitAPIException {
         this.projectName=prName;
         File f = new File("./Test"+projectName);
         Git git;
@@ -166,6 +221,6 @@ public class Deliverable1 {
                     listaF.add(c);
                  }
             }
-            printOnFile("/Users/kobero/Desktop/"+projectName+"_"+version+".csv");
+            return listaF;
         }
     }
