@@ -79,10 +79,10 @@ public class Deliverable1 {
         }
     }
 
-    public void printTraningSet(List<ARFFList> listaF, String prName) throws IOException {
-        File directory=new File("./trainingSet"+projectName);
+    public String printTraningSet(List<ARFFList> listaF, String prName) throws IOException {
+        File directory=new File("./"+projectName+"/trainingSet_"+projectName);
         directory.mkdir();
-        File file=new File("./trainingSet"+projectName+"/"+prName+".arff");
+        File file=new File("./"+projectName+"/trainingSet_"+projectName+"/"+prName+".arff");
         try(FileWriter writer=new FileWriter(file)){
             writer.write("@relation "+projectName);
             writer.write("\n");
@@ -99,7 +99,7 @@ public class Deliverable1 {
             writer.write("@attribute Avg_Churn numeric\n");
             writer.write("@attribute IsBuggy {false,true}\n");
             writer.write("@data\n");
-            for (ARFFList app:listaF.subList(0,listaF.size()-2))
+            for (ARFFList app:listaF.subList(0,listaF.size()-1))
             {
                 for (String[] stringArray:app.toArrayString()){
                     int i;
@@ -112,12 +112,15 @@ public class Deliverable1 {
                 }
             }
         }
+        return file.getPath();
     }
-    public void printTestingSet(List<ARFFList> arffLists) throws IOException {
-        File directory=new File("./TestingSet_"+projectName);
+    public List<String> printTestingSet(List<ARFFList> arffLists) throws IOException {
+        File directory=new File("./"+projectName+"/TestingSet_"+projectName);
         directory.mkdir();
+        List<String> list=new ArrayList<>();
         for(int i=0;i<arffLists.size()-1;i++){
-            String path="./TestingSet_"+projectName+"/"+projectName+"_"+i+".arff";
+            String path="./"+projectName+"/TestingSet_"+projectName+"/"+projectName+"_"+i+".arff";
+            list.add(path);
             File file=new File(path);
             try(FileWriter writer=new FileWriter(file)){
                 writer.write("@relation "+projectName);
@@ -147,7 +150,7 @@ public class Deliverable1 {
                 }
             }
         }
-
+        return list;
     }
 
     private void functionDiffEntry(List<DiffEntry> listDiff, ARFFList c, Bug bugCatch, String nameAuthor, DiffFormatter formatter) throws IOException {
