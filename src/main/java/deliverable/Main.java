@@ -18,9 +18,9 @@ public class Main {
     private static final String prName="Avro";
     private static final String link="https://github.com/kobero98/avro.git";
     private static List<Classificatore> computeEvaluation(List<String> listTrainingPath, List<String> listTestingPath) throws Exception {
-        String [] sampling={"oversampling","undersampling","smote","nulla"};
-        String [] feature={"nulla","bestFirst"};
-        String [] cost={"sensitiveThreshold","sensitiveLearning","nulla"};
+        String [] sampling={"oversampling","undersampling","smote","nienteSampling"};
+        String [] feature={"NienteFeatureSelection","bestFirst"};
+        String [] cost={"sensitiveThreshold","sensitiveLearning","nienteCostSensitive"};
 
         List <Classificatore> listClassificatore=new ArrayList<>();
         for (int j =1; j < listTrainingPath.size(); j++) {

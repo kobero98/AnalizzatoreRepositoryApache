@@ -37,11 +37,8 @@ public class StatisticCreation {
         String[] opts = new String[]{ "-C", "0", "-K", "5", "-P", "100.0", "-S", "1" };
         smote.setOptions(opts);
         smote.setInputFormat(training);
-        Instances newTraining= Filter.useFilter(training, smote);
-        return newTraining;
+        return Filter.useFilter(training, smote);
     }
-
-
     private static CostMatrix createCostMatrix(double weightFalsePositive, double weightFalseNegative) {
         CostMatrix costMatrix = new CostMatrix(2);
         costMatrix.setCell(0, 0, 0.0);
@@ -49,12 +46,6 @@ public class StatisticCreation {
         costMatrix.setCell(0, 1, weightFalseNegative);
         costMatrix.setCell(1, 1, 0.0);
         return costMatrix;
-    }
-    private static CostSensitiveClassifier commonCostSensitive(Classifier classifier, Instances training) throws Exception {
-        CostSensitiveClassifier c1 = new CostSensitiveClassifier();
-        c1.setClassifier(classifier);
-        c1.setCostMatrix( createCostMatrix(10, 1));
-        return c1;
     }
     private Classifier costSensitive(Classifier c){
         CostSensitiveClassifier csf= new CostSensitiveClassifier();
