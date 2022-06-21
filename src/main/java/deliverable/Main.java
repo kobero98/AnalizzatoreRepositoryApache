@@ -1,7 +1,7 @@
 package deliverable;
+import com.opencsv.CSVWriter;
 import creator.file.csv.ARFFList;
 import creator.file.csv.Deliverable1;
-import weka.classifiers.Evaluation;
 import weka.classifiers.bayes.NaiveBayes;
 import weka.classifiers.lazy.IBk;
 import weka.classifiers.trees.RandomForest;
@@ -10,54 +10,67 @@ import weka.core.converters.ConverterUtils;
 
 import java.io.File;
 import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
     private static final String prName="Avro";
     private static final String link="https://github.com/kobero98/avro.git";
-    private static void creazioneCSV(List<String> listTrainingPath, List<String> listTestingPath, File f) throws Exception {
+    private static List<Classificatore> computeEvaluation(List<String> listTrainingPath, List<String> listTestingPath) throws Exception {
+        String [] sampling={"oversampling","undersampling","smote","nulla"};
+        String [] feature={"nulla","bestFirst"};
+        String [] cost={"sensitiveThreshold","sensitiveLearning","nulla"};
 
-        try(FileWriter writer=new FileWriter(f)){
-            writer.write("Project,Version,classifier,precision,recall,AUC,kappa\n");
-            for (int j=0;j<listTrainingPath.size();j++)
+        List <Classificatore> listClassificatore=new ArrayList<>();
+        for (int j = 0; j < listTrainingPath.size(); j++) {
+            ConverterUtils.DataSource source1 = new ConverterUtils.DataSource(listTrainingPath.get(j));
+            Instances training = source1.getDataSet();
+            ConverterUtils.DataSource source2 = new ConverterUtils.DataSource(listTestingPath.get(j + 1));
+            Instances testing = source2.getDataSet();
+            int numAttr = training.numAttributes();
+            training.setClassIndex(numAttr - 1);
+            testing.setClassIndex(numAttr - 1);
+            for (int i =0;i<sampling.length;i++)
             {
-                ConverterUtils.DataSource source1 = new ConverterUtils.DataSource(listTrainingPath.get(j));
-                Instances training = source1.getDataSet();
-                ConverterUtils.DataSource source2 = new ConverterUtils.DataSource(listTestingPath.get(j+1));
-                Instances testing = source2.getDataSet();
-                int numAttr = training.numAttributes();
-                training.setClassIndex(numAttr - 1);
-                testing.setClassIndex(numAttr - 1);
-                //NaiveBayes
-                NaiveBayes classifier1 = new NaiveBayes();
-                classifier1.buildClassifier(training);
-                Evaluation eval = new Evaluation(testing);
-                eval.evaluateModel(classifier1, testing);
-                writer.write(prName+","+(j+1)+",NaiveBayes,"+ Math.round(eval.precision(1) * 10000) / 10000d +","
-                        + Math.round(eval.recall(1) * 10000) / 10000d +","
-                        + Math.round(eval.areaUnderROC(1) * 10000) / 10000d +","
-                        + Math.round(eval.kappa() * 10000) / 10000d +"\n");
-                //RandomForest
-                RandomForest classifier2=new RandomForest();
-                classifier2.buildClassifier(training);
-                Evaluation eval2 = new Evaluation(testing);
-                eval2.evaluateModel(classifier2, testing);
-                writer.write(prName+","+(j+1)+",RandomForest,"+ Math.round(eval2.precision(1) * 10000) / 10000d+","
-                        + Math.round(eval2.recall(1) * 10000) / 10000d +","
-                        + Math.round(eval2.areaUnderROC(1) * 10000) / 10000d +","
-                        + Math.round(eval2.kappa() * 10000) / 10000d +"\n");
-                //IBk
-                IBk classifier3=new IBk();
-                classifier3.buildClassifier(training);
-                Evaluation eval3 = new Evaluation(testing);
-                eval3.evaluateModel(classifier3, testing);
-                eval3.evaluateModel(classifier3, testing);
-                writer.write(prName+","+(j+1)+",IBk,"+ Math.round(eval3.precision(1) * 10000) / 10000d +","
-                        + Math.round(eval3.recall(1) * 10000) / 10000d+","
-                        + Math.round(eval3.areaUnderROC(1) * 10000) / 10000d +","
-                        + Math.round(eval3.kappa() * 10000) / 10000d +"\n");
+                for(int k=0;k<feature.length;k++)
+                {
+                    for(int f=0;f<cost.length;f++)
+                    {
+                        StatisticCreation s1= new StatisticCreation();
+                        s1.setCostSensitive(cost[f]);
+                        s1.setFeature(feature[k]);
+                        s1.setSampling(sampling[i]);
+                        NaiveBayes c1=new NaiveBayes();
+                        RandomForest c2=new RandomForest();
+                        IBk c3=new IBk();
+
+                        Classificatore d=s1.createStatistic(c1,training,testing);
+                        d.setNomeClassifiatore("NaiveBayes");
+                        d.setRelease(listTestingPath.get(j));
+                        listClassificatore.add(d);
+                        d=s1.createStatistic(c2,training,testing);
+                        d.setNomeClassifiatore("Random Forest");
+                        d.setRelease(listTestingPath.get(j));
+                        listClassificatore.add(d);
+                        d=s1.createStatistic(c3,training,testing);
+                        d.setNomeClassifiatore("IBk");
+                        d.setRelease(listTrainingPath.get(j));
+                        listClassificatore.add(d);
+                    }
+                }
             }
+        }
+        return listClassificatore;
+    }
+    private static void creazioneResultCSV(List<Classificatore>list,File f) throws IOException {
+        try (CSVWriter writer = new CSVWriter(new FileWriter(f))) {
+            writer.writeNext(Classificatore.getListNameROW());
+            for (Classificatore app:list)
+            {
+                writer.writeNext(app.getROW());
+            }
+            writer.flush();
         }
     }
     public static void main(String [] args) throws Exception {
@@ -72,8 +85,8 @@ public class Main {
             List<ARFFList> training=d.obtainARFFList(prName,link,i);
             listTrainingPath.add(d.printTraningSet(training,prName+"_"+i));
         }
-        File f=new File("./"+prName+"result_"+prName+".csv");
-        creazioneCSV(listTrainingPath,listTestingPath,f);
-
+        List<Classificatore> list=computeEvaluation(listTrainingPath,listTestingPath);
+        File resultSet=new File("./resultFinalStatistic.csv");
+        creazioneResultCSV(list,resultSet);
     }
 }
