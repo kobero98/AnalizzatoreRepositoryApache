@@ -15,8 +15,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Main {
-    private static final String prName="Avro";
-    private static final String link="https://github.com/kobero98/avro.git";
+    private static final String PR_NAME ="Avro";
+    private static final String LINK ="https://github.com/kobero98/avro.git";
     private static List<Classificatore> computeEvaluation(List<String> listTrainingPath, List<String> listTestingPath) throws Exception {
         String [] sampling={"oversampling","undersampling","smote","nienteSampling"};
         String [] feature={"NienteFeatureSelection","bestFirst"};
@@ -74,16 +74,16 @@ public class Main {
         }
     }
     public static void main(String [] args) throws Exception {
-        File file=new File("./"+prName);
+        File file=new File("./"+ PR_NAME);
         file.mkdir();
         Deliverable1 d=new Deliverable1();
-        List<ARFFList> testingSet =d.obtainARFFList(prName,link,0);
+        List<ARFFList> testingSet =d.obtainARFFList(PR_NAME, LINK,0);
         List<String> listTestingPath=d.printTestingSet(testingSet);
         List<String> listTrainingPath=new ArrayList<>();
         for (int i=1;i<testingSet.size()/2;i++)
         {
-            List<ARFFList> training=d.obtainARFFList(prName,link,i);
-            listTrainingPath.add(d.printTraningSet(training,prName+"_"+i));
+            List<ARFFList> training=d.obtainARFFList(PR_NAME, LINK,i);
+            listTrainingPath.add(d.printTraningSet(training, PR_NAME +"_"+i));
         }
         List<Classificatore> list=computeEvaluation(listTrainingPath,listTestingPath);
         File resultSet=new File("./resultFinalStatistic.csv");
