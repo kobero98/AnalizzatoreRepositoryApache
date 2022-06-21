@@ -91,12 +91,10 @@ public class StatisticCreation {
     }
     private Classifier applySampling(Classifier c) throws Exception {
         if(this.sampling.compareTo("undersampling")==0){
-            Classifier c1=underSampling(c);
-            return c1;
+            return underSampling(c);
         }
         if(this.sampling.compareTo("oversampling")==0){
-            Classifier c1=overSampling(c);
-            return c1;
+            return overSampling(c);
         }
         return c;
     }
