@@ -82,7 +82,7 @@ public class Deliverable1 {
     public String printTraningSet(List<ARFFList> listaF, String prName) throws IOException {
         File directory=new File("./"+projectName+"/trainingSet_"+projectName);
         directory.mkdir();
-        File file=new File("./"+projectName+"/trainingSet_"+projectName+"/"+prName+".arff");
+        File file=new File("./"+projectName+"/trainingSet_"+projectName+"/file_"+prName+".arff");
         try(FileWriter writer=new FileWriter(file)){
             writer.write("@relation "+projectName);
             writer.write("\n");
@@ -119,7 +119,7 @@ public class Deliverable1 {
         directory.mkdir();
         List<String> list=new ArrayList<>();
         for(int i=0;i<arffLists.size()-1;i++){
-            String path="./"+projectName+"/TestingSet_"+projectName+"/"+projectName+"_"+i+".arff";
+            String path="./"+projectName+"/TestingSet_"+projectName+"/file_"+projectName+"_"+i+".arff";
             list.add(path);
             File file=new File(path);
             try(FileWriter writer=new FileWriter(file)){

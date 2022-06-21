@@ -139,11 +139,11 @@ public class StatisticCreation {
         if(eval.precision(1)!=Double.NaN)
             date.setPrecision(eval.precision(1));
         date.setRecall(eval.recall(1));
-        date.setAUC(eval.areaUnderROC(1));
-        date.setFN(eval.numFalseNegatives(1));
-        date.setFP(eval.numFalsePositives(1));
-        date.setTP(eval.numTruePositives(1));
-        date.setTN(eval.numTrueNegatives(1));
+        date.setAuc(eval.areaUnderROC(1));
+        date.setFn(eval.numFalseNegatives(1));
+        date.setFp(eval.numFalsePositives(1));
+        date.setTp(eval.numTruePositives(1));
+        date.setTn(eval.numTrueNegatives(1));
         date.setPercentageDate(((double) this.training.size())/(this.training.size()+this.testing.size()));
         int count=0;
         for(Instance i:this.training){

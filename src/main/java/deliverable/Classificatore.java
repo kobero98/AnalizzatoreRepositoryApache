@@ -3,7 +3,7 @@ package deliverable;
 public class Classificatore {
 
     private String nomeClassifiatore;
-    private String Release;
+    private String release;
     private String costSensitive;
     private String sampling;
     private String feature;
@@ -13,14 +13,14 @@ public class Classificatore {
     private double defectedTraing;
     private double percentageDate;
 
-    private double TP;
-    private double TN;
-    private double FP;
-    private double FN;
+    private double tp;
+    private double tn;
+    private double fp;
+    private double fn;
     private double recall;
     private double precision;
     private double kappa;
-    private double AUC;
+    private double auc;
 
 
     public void setNomeClassifiatore(String nomeClassifiatore) {
@@ -49,33 +49,33 @@ public class Classificatore {
     }
 
 
-    public double getTP() {
-        return TP;
+    public double getTp() {
+        return tp;
     }
 
-    public void setTP(double TP) {
-        this.TP = TP;
+    public void setTp(double tp) {
+        this.tp = tp;
     }
 
 
-    public void setTN(double TN) {
-        this.TN = TN;
+    public void setTn(double tn) {
+        this.tn = tn;
     }
 
-    public double getFP() {
-        return FP;
+    public double getFp() {
+        return fp;
     }
 
-    public void setFP(double FP) {
-        this.FP = FP;
+    public void setFp(double fp) {
+        this.fp = fp;
     }
 
-    public double getFN() {
-        return FN;
+    public double getFn() {
+        return fn;
     }
 
-    public void setFN(double FN) {
-        this.FN = FN;
+    public void setFn(double fn) {
+        this.fn = fn;
     }
 
 
@@ -98,8 +98,8 @@ public class Classificatore {
 
 
 
-    public void setAUC(double AUC) {
-        this.AUC = AUC;
+    public void setAuc(double auc) {
+        this.auc = auc;
     }
 
 
@@ -109,18 +109,18 @@ public class Classificatore {
     }
 
     public String getRelease() {
-        return Release;
+        return release;
     }
 
     public void setRelease(String release) {
-        Release = release;
+        this.release = release;
     }
     public static String [] getListNameROW(){
         return new String[]{"Release", "nomeClassificatore", "CostSensitive", "Sampling", "feature","PercentageDate","DefectedTraining","DefectedTesting","TP","TN","FP","FN","precision","Recall","AUC","kappa"};
     }
     public String [] getROW(){
         String [] s=new String[16];
-        s[0]=Release;
+        s[0]= release;
         s[1]=nomeClassifiatore;
         s[2]=costSensitive;
         s[3]=sampling;
@@ -128,13 +128,13 @@ public class Classificatore {
         s[5]=Double.toString(percentageDate);
         s[6]=Double.toString(defectedTraing);
         s[7]=Double.toString(defectedTesting);
-        s[8]=Double.toString(TP);
-        s[9]=Double.toString(FP);
-        s[10]=Double.toString(TN);
-        s[11]=Double.toString(FN);
+        s[8]=Double.toString(tp);
+        s[9]=Double.toString(fp);
+        s[10]=Double.toString(tn);
+        s[11]=Double.toString(fn);
         s[12]=Double.toString(precision);
         s[13]=Double.toString(recall);
-        s[14]=Double.toString(AUC);
+        s[14]=Double.toString(auc);
         s[15]=Double.toString(kappa);
         return s;
     }
