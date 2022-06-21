@@ -23,7 +23,7 @@ public class Main {
         String [] cost={"sensitiveThreshold","sensitiveLearning","nulla"};
 
         List <Classificatore> listClassificatore=new ArrayList<>();
-        for (int j = 0; j < listTrainingPath.size(); j++) {
+        for (int j =1; j < listTrainingPath.size(); j++) {
             ConverterUtils.DataSource source1 = new ConverterUtils.DataSource(listTrainingPath.get(j));
             Instances training = source1.getDataSet();
             ConverterUtils.DataSource source2 = new ConverterUtils.DataSource(listTestingPath.get(j + 1));
