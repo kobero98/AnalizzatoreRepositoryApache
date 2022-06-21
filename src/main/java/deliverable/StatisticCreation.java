@@ -135,7 +135,9 @@ public class StatisticCreation {
         date.setCostSensitive(this.costSensitive);
         date.setFeature(this.feature);
         date.setKappa(eval.kappa());
-        date.setPrecision(eval.precision(1));
+        date.setPrecision(0.0);
+        if(eval.precision(1)!=Double.NaN)
+            date.setPrecision(eval.precision(1));
         date.setRecall(eval.recall(1));
         date.setAUC(eval.areaUnderROC(1));
         date.setFN(eval.numFalseNegatives(1));
